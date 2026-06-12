@@ -1,6 +1,6 @@
 export interface ProjectConfig {
   root: string;
-  
+
   memoryDir: string;
 }
 

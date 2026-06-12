@@ -24,8 +24,10 @@
   },
   "homepage": "https://github.com/IgoHz/ai-memory-engine#readme",
   "dependencies": {
+    "@langchain/textsplitters": "^1.0.1",
     "glob": "^13.0.6",
     "gray-matter": "^4.0.3",
+    "langchain": "^1.4.4",
     "yaml": "^2.9.0",
     "zod": "^4.4.3"
   },

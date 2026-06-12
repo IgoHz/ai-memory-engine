@@ -4,6 +4,6 @@ export interface RawMemoryFile {
   absolutePath: string;
 
   relativePath: string;
-  
+
   content: string;
 }
