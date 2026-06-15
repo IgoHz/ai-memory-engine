@@ -16,7 +16,7 @@ async function createChunks(document: MemoryDocument): Promise<MemoryChunk[]> {
   const chunks = await splitter.splitText(document.content);
 
   return chunks.map((content, index) => ({
-    id: createChunkId(document.metadata.path, index),
+    id: createChunkId(document.metadata.filePath, index),
 
     content,
 

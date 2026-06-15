@@ -15,7 +15,7 @@ export function getChunkStats(
         );
 
   return {
-    documents: new Set(rawChunks.map((chunk) => chunk.metadata.path)).size,
+    documents: new Set(rawChunks.map((chunk) => chunk.metadata.filePath)).size,
 
     rawChunks: rawChunks.length,
 

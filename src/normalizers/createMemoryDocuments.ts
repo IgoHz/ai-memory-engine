@@ -30,7 +30,7 @@ function normalizeMetadata(
 
   return {
     project,
-    path,
+    filePath: path,
     type,
     title,
     tags

@@ -1,13 +1,13 @@
 export interface MemoryMetadata {
   project: string;
 
-  path: string;
-
   type?: string;
 
   title?: string;
 
   tags: string[];
+
+  filePath: string;
 
   updatedAt?: string;
 }
