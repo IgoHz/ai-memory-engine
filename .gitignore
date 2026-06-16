@@ -147,3 +147,5 @@ db/
 !src/db/
 
 .DS_Store
+
+config/projects.yaml

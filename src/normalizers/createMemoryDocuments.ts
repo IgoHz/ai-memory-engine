@@ -1,17 +1,27 @@
 import type { ParsedMemoryFile } from '../types/parsedMemoryFile.js';
 import type { MemoryDocument, MemoryMetadata } from '../types/memory.js';
+import { calculateFileHash } from '../indexer/index.js';
+import { stat } from 'node:fs/promises';
 
-export function createMemoryDocuments(
+export async function createMemoryDocuments(
   files: ParsedMemoryFile[]
-): MemoryDocument[] {
-  return files.map(createMemoryDocument);
+): Promise<MemoryDocument[]> {
+  return Promise.all(files.map(createMemoryDocument));
 }
 
-function createMemoryDocument(file: ParsedMemoryFile): MemoryDocument {
+async function createMemoryDocument(
+  file: ParsedMemoryFile
+): Promise<MemoryDocument> {
+  const stats = await stat(file.absolutePath);
+
   return {
     content: file.content,
 
-    metadata: normalizeMetadata(file.project, file.relativePath, file.metadata)
+    metadata: normalizeMetadata(file.project, file.relativePath, file.metadata),
+
+    hash: calculateFileHash(file.content),
+
+    updatedAt: stats.mtime.toISOString()
   };
 }
 

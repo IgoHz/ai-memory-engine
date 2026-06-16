@@ -26,6 +26,7 @@
   "homepage": "https://github.com/IgoHz/ai-memory-engine#readme",
   "dependencies": {
     "@lancedb/lancedb": "^0.30.0",
+    "@langchain/ollama": "^1.2.7",
     "@langchain/textsplitters": "^1.0.1",
     "apache-arrow": "^21.1.0",
     "glob": "^13.0.6",
