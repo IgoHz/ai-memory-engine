@@ -1,6 +1,8 @@
 import { getChunksTable } from '../db/index.js';
 import { generateEmbedding } from '../embeddings/index.js';
+import { filterByScore } from './filterByScore.js';
 import { filterChunk } from './filterChunk.js';
+import { mergeChunks } from './mergeChunks.js';
 import type { RetrievedChunk, SearchOptions } from './types.js';
 
 export async function vectorSearch(
@@ -26,9 +28,13 @@ export async function vectorSearch(
     })
   );
 
-  const filtered = chunks.filter((chunk) =>
+  const metadataFiltered = chunks.filter((chunk) =>
     filterChunk(chunk, options.filters!)
   );
 
-  return filtered.slice(0, options.limit ?? 10);
+  const scoreFiltered = filterByScore(metadataFiltered, options.minScore);
+
+  const merged = mergeChunks(scoreFiltered);
+
+  return merged.slice(0, options.limit ?? 10);
 }

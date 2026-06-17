@@ -7,14 +7,6 @@ export interface RetrievedChunk {
   metadata: MemoryMetadata;
 }
 
-export interface SearchOptions {
-  limit?: number;
-}
-
-export interface SearchResponse {
-  chunks: RetrievedChunk[];
-}
-
 export interface FilterOptions {
   project?: string;
   type?: string;
@@ -24,5 +16,10 @@ export interface FilterOptions {
 
 export interface SearchOptions {
   limit?: number;
+  minScore?: number;
   filters?: FilterOptions;
+}
+
+export interface SearchResponse {
+  chunks: RetrievedChunk[];
 }
