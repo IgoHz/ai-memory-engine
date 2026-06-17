@@ -10,5 +10,10 @@ export async function indexDocument(document: MemoryDocument): Promise<void> {
     chunks.map((chunk) => chunk.content)
   );
 
-  await updateDocumentChunks(document.metadata.filePath, chunks, embeddings);
+  await updateDocumentChunks(
+    document.metadata.project,
+    document.metadata.filePath,
+    chunks,
+    embeddings
+  );
 }

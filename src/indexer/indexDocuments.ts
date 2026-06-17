@@ -4,6 +4,7 @@ import { createDocumentChunks } from '../chunkers/createDocumentChunks.js';
 import { generateEmbeddings } from '../embeddings/index.js';
 
 export async function indexDocuments(
+  project: string,
   documents: MemoryDocument[]
 ): Promise<void> {
   for (const document of documents) {
@@ -13,6 +14,11 @@ export async function indexDocuments(
       chunks.map((chunk) => chunk.content)
     );
 
-    await updateDocumentChunks(document.metadata.filePath, chunks, embeddings);
+    await updateDocumentChunks(
+      project,
+      document.metadata.filePath,
+      chunks,
+      embeddings
+    );
   }
 }

@@ -1,11 +1,10 @@
 import type { Table } from '@lancedb/lancedb';
-import { getDatabase } from './connect.js';
-import { TABLE_NAME } from './tableSchema.js';
 import { logger } from '../utils/logger.js';
 import type { MemoryChunk } from '../types/memoryChunk.js';
 import { mapChunkToRecord } from './mapChunkToRecord.js';
 
 export async function addChunks(
+  table: Table,
   chunks: MemoryChunk[],
   embeddings: number[][]
 ): Promise<void> {
@@ -21,24 +20,7 @@ export async function addChunks(
     mapChunkToRecord(chunk, embeddings[index])
   );
 
-  const db = await getDatabase();
-
-  let table: Table;
-  let newlyCreated = false;
-
-  try {
-    table = await db.openTable(TABLE_NAME);
-  } catch {
-    logger.info('Creating LanceDB table');
-
-    table = await db.createTable(TABLE_NAME, records);
-
-    newlyCreated = true;
-  }
-
-  if (!newlyCreated) {
-    await table.add(records);
-  }
+  await table.add(records);
 
   logger.info('Inserted vectors', {
     count: records.length

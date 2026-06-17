@@ -1,8 +1,10 @@
 import type { MemoryChunk } from '../types/memoryChunk.js';
 import { addChunks } from './addChunks.js';
 import { deleteDocumentChunks } from './deleteDocumentChunks.js';
+import { getChunksTable } from './getChunksTable.js';
 
 export async function updateDocumentChunks(
+  project: string,
   path: string,
   chunks: MemoryChunk[],
   embeddings: number[][]
@@ -10,8 +12,9 @@ export async function updateDocumentChunks(
   if (!chunks.length) {
     return;
   }
+  const table = await getChunksTable(project);
 
-  await deleteDocumentChunks(path);
+  await deleteDocumentChunks(table, path);
 
-  await addChunks(chunks, embeddings);
+  await addChunks(table, chunks, embeddings);
 }

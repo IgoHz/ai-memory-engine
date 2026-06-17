@@ -1,11 +1,10 @@
-import { getDatabase } from './connect.js';
-import { TABLE_NAME } from './tableSchema.js';
 import { logger } from '../utils/logger.js';
+import { Table } from '@lancedb/lancedb';
 
-export async function deleteDocumentChunks(path: string): Promise<void> {
-  const db = await getDatabase();
-  const table = await db.openTable(TABLE_NAME);
-
+export async function deleteDocumentChunks(
+  table: Table,
+  path: string
+): Promise<void> {
   await table.delete(`metadata.path = '${path.replaceAll("'", "\\'")}'`);
 
   logger.info('Deleted document vectors', {

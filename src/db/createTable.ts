@@ -1,11 +1,23 @@
 import type { Connection } from '@lancedb/lancedb';
-import { TABLE_NAME } from './tableSchema.js';
+import { logger } from '../utils/index.js';
+import { getProjectTableName } from './getProjectTableName.js';
 
-export async function createTable(connection: Connection) {
-  try {
-    return await connection.openTable(TABLE_NAME);
-  } catch {
-    // return connection.createTable(TABLE_NAME, []);
-    return null;
+export async function createTable(db: Connection, project: string) {
+  const tableName = getProjectTableName(project);
+
+  const tableNames = await db.tableNames();
+
+  if (tableNames.includes(tableName)) {
+    logger.info('Opening table', {
+      table: tableName
+    });
+
+    return db.openTable(tableName);
   }
+
+  logger.info('Creating table', {
+    table: tableName
+  });
+
+  return db.createTable(tableName, []);
 }

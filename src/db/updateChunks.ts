@@ -1,8 +1,10 @@
 import type { MemoryChunk } from '../types/memoryChunk.js';
 import { addChunks } from './addChunks.js';
 import { deleteChunks } from './deleteChunks.js';
+import { Table } from '@lancedb/lancedb';
 
 export async function updateChunks(
+  table: Table,
   chunks: MemoryChunk[],
   embeddings: number[][]
 ): Promise<void> {
@@ -14,5 +16,5 @@ export async function updateChunks(
 
   await deleteChunks(chunkIds);
 
-  await addChunks(chunks, embeddings);
+  await addChunks(table, chunks, embeddings);
 }
