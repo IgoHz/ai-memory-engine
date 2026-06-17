@@ -1,5 +1,5 @@
-import { lancedbService } from '../db/LanceDbService.js';
-import { generateEmbedding } from '../embeddings/index.js';
+import { lancedbService } from '../db';
+import { embeddingsService } from '../embeddings/EmbeddingsService.js';
 import { filterByScore } from './filterByScore.js';
 import { filterChunk } from './filterChunk.js';
 import { mergeChunks } from './mergeChunks.js';
@@ -15,7 +15,7 @@ export async function vectorSearch(
 
   const table = await lancedbService.getChunksTable(options.filters.project);
 
-  const embedding = await generateEmbedding(query);
+  const embedding = await embeddingsService.generateEmbedding(query);
 
   const results = await table.search(embedding).limit(100).toArray();
 

@@ -1,12 +1,12 @@
 import type { MemoryDocument } from '../types/memory.js';
-import { createDocumentChunks } from '../chunkers/createDocumentChunks.js';
-import { lancedbService } from '../db/LanceDbService.js';
-import { generateEmbeddings } from '../embeddings/index.js';
+import { lancedbService } from '../db';
+import { chunkersService } from '../chunkers';
+import { embeddingsService } from '../embeddings';
 
 export async function indexDocument(document: MemoryDocument): Promise<void> {
-  const chunks = await createDocumentChunks([document]);
+  const chunks = await chunkersService.createDocumentChunks([document]);
 
-  const embeddings = await generateEmbeddings(
+  const embeddings = await embeddingsService.generateEmbeddings(
     chunks.map((chunk) => chunk.content)
   );
 

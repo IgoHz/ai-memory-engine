@@ -1,7 +1,7 @@
 import type { Formatter } from './types.js';
 import type { RetrievedChunk } from '../retrievers/types.js';
 
-export class MarkdownFormatter implements Formatter {
+class MarkdownFormatter implements Formatter {
   format(chunks: RetrievedChunk[]): string {
     return chunks
       .map(
@@ -16,3 +16,5 @@ ${chunk.content}
       .join('\n---\n');
   }
 }
+
+export const markdownFormatter = new MarkdownFormatter();
