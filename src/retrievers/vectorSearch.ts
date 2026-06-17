@@ -1,4 +1,4 @@
-import { getChunksTable } from '../db/index.js';
+import { lancedbService } from '../db/LanceDbService.js';
 import { generateEmbedding } from '../embeddings/index.js';
 import { filterByScore } from './filterByScore.js';
 import { filterChunk } from './filterChunk.js';
@@ -13,7 +13,7 @@ export async function vectorSearch(
     throw new Error('Project filter is required');
   }
 
-  const table = await getChunksTable(options.filters.project);
+  const table = await lancedbService.getChunksTable(options.filters.project);
 
   const embedding = await generateEmbedding(query);
 
