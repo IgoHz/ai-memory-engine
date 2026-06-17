@@ -1,7 +1,7 @@
 import type { ParsedMemoryFile } from '../types/parsedMemoryFile.js';
 import type { MemoryDocument, MemoryMetadata } from '../types/memory.js';
-import { calculateFileHash } from '../indexer/index.js';
 import { stat } from 'node:fs/promises';
+import { indexerService } from '../indexer/';
 
 export async function createMemoryDocuments(
   files: ParsedMemoryFile[]
@@ -19,7 +19,7 @@ async function createMemoryDocument(
 
     metadata: normalizeMetadata(file.project, file.relativePath, file.metadata),
 
-    hash: calculateFileHash(file.content),
+    hash: indexerService.calculateFileHash(file.content),
 
     updatedAt: stats.mtime.toISOString()
   };

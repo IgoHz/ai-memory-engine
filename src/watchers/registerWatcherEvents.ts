@@ -1,8 +1,7 @@
 import type { FSWatcher } from 'chokidar';
 import type { ProjectsRegistry } from '../types/project.js';
-import { logger } from '../utils/index.js';
-import { indexProject } from '../indexer/indexProject.js';
 import { beginReindex, finishReindex, isReindexing } from './reindexQueue.js';
+import { indexerService } from '../indexer/';
 
 export function registerWatcherEvents(
   watcher: FSWatcher,
@@ -17,7 +16,7 @@ export function registerWatcherEvents(
     beginReindex(projectName);
 
     try {
-      await indexProject(registry, projectName);
+      await indexerService.indexProject(registry, projectName);
     } finally {
       finishReindex(projectName);
     }
