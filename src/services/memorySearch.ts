@@ -1,4 +1,4 @@
-import { contextFormatter } from '../formatters/ContextFormatterService.js';
+import { contextFormatterService } from '../formatters/ContextFormatterService.js';
 import { retrieverService } from '../retrievers/RetrieversService.js';
 import type { FilterOptions } from '../retrievers/types.js';
 
@@ -28,7 +28,7 @@ export async function memorySearch(
   });
 
   return {
-    content: contextFormatter.format(chunks),
+    content: contextFormatterService.format(chunks),
     chunksFound: chunks.length
   };
 }

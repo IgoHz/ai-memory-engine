@@ -1,7 +1,7 @@
 import type { Formatter } from './types.js';
 import type { RetrievedChunk } from '../retrievers/types.js';
 
-class ContextFormatter implements Formatter {
+class ContextFormatterService implements Formatter {
   format(chunks: RetrievedChunk[]): string {
     return chunks
       .map(
@@ -13,4 +13,4 @@ ${chunk.content}`
   }
 }
 
-export const contextFormatter = new ContextFormatter();
+export const contextFormatterService = new ContextFormatterService();
