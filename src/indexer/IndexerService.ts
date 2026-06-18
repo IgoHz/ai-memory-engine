@@ -1,4 +1,4 @@
-import { loadProjects } from '../registry/loadProjects';
+import { registryService } from '../registry';
 import { ProjectsRegistry } from '../types/project';
 import { createProjectDocuments } from '../normalizers/createProjectDocuments';
 import { logger } from '../utils/logger';
@@ -15,7 +15,7 @@ const INDEX_STATE_PATH = './db/indexState.json';
 
 class IndexerService {
   async indexAllProjects(): Promise<void> {
-    const registry = await loadProjects();
+    const registry = await registryService.loadProjects();
 
     await Promise.all(
       Object.keys(registry.projects).map((projectName) =>

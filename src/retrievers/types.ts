@@ -19,7 +19,3 @@ export interface SearchOptions {
   minScore?: number;
   filters?: FilterOptions;
 }
-
-export interface SearchResponse {
-  chunks: RetrievedChunk[];
-}

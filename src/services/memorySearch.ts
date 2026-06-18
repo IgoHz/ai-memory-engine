@@ -1,5 +1,5 @@
-import { vectorSearch } from '../retrievers/index.js';
 import { contextFormatter } from '../formatters/ContextFormatterService.js';
+import { retrieverService } from '../retrievers/RetrieversService.js';
 import type { FilterOptions } from '../retrievers/types.js';
 
 export interface MemorySearchOptions {
@@ -18,7 +18,7 @@ export interface MemorySearchResult {
 export async function memorySearch(
   options: MemorySearchOptions
 ): Promise<MemorySearchResult> {
-  const chunks = await vectorSearch(options.query, {
+  const chunks = await retrieverService.vectorSearch(options.query, {
     limit: options.limit,
     minScore: options.minScore,
     filters: {
