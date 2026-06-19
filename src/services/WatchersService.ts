@@ -1,7 +1,7 @@
 import chokidar, { type FSWatcher } from 'chokidar';
 import type { ProjectConfig } from '../types/project.js';
 import type { ProjectsRegistry } from '../types/project.js';
-import { indexerService } from '../indexer/';
+import { indexerService } from '../services';
 import { logger } from '../utils/logger.js';
 
 class WatchersService {

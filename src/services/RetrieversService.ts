@@ -1,6 +1,10 @@
-import { FilterOptions, RetrievedChunk, SearchOptions } from './types';
-import { lancedbService } from '../db';
-import { embeddingsService } from '../embeddings/EmbeddingsService.js';
+import {
+  FilterOptions,
+  RetrievedChunk,
+  SearchOptions
+} from '../types/retriever.js';
+import { vectorStoreService } from './VectorStoreService.js';
+import { embeddingsService } from './EmbeddingsService.js';
 
 class RetrieverService {
   async vectorSearch(
@@ -11,7 +15,9 @@ class RetrieverService {
       throw new Error('Project filter is required');
     }
 
-    const table = await lancedbService.getChunksTable(options.filters.project);
+    const table = await vectorStoreService.getChunksTable(
+      options.filters.project
+    );
 
     const embedding = await embeddingsService.generateEmbedding(query);
 

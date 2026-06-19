@@ -1,14 +1,16 @@
 import { Connection, Table } from '@lancedb/lancedb';
 import type { MemoryChunk } from '../types/memoryChunk.js';
-import { mapChunkToRecord } from './mapChunkToRecord.js';
 import { logger } from '../utils/logger.js';
 import * as lancedb from '@lancedb/lancedb';
 import { DATABASE_PATH } from '../config/database.js';
-import { TABLE_NAME } from './tableSchema.js';
+import { VectorRecord } from '../types/vectorRecord.js';
+
+export const TABLE_NAME = 'memory_chunks';
+export const VECTOR_DIMENSIONS = 768;
 
 let connection: Connection | null = null;
 
-class LanceDbService {
+class VectorStoreService {
   async updateDocumentChunks(
     project: string,
     path: string,
@@ -117,7 +119,7 @@ class LanceDbService {
     }
 
     const records = chunks.map((chunk, index) =>
-      mapChunkToRecord(chunk, embeddings[index])
+      this.mapChunkToRecord(chunk, embeddings[index])
     );
 
     await table.add(records);
@@ -125,6 +127,21 @@ class LanceDbService {
     logger.info('Inserted vectors', {
       count: records.length
     });
+  }
+
+  private mapChunkToRecord(
+    chunk: MemoryChunk,
+    embedding: number[]
+  ): VectorRecord {
+    return {
+      id: chunk.id,
+
+      vector: embedding,
+
+      content: chunk.content,
+
+      metadata: chunk.metadata
+    };
   }
 
   private async countVectors(): Promise<number> {
@@ -150,4 +167,4 @@ class LanceDbService {
   }
 }
 
-export const lancedbService = new LanceDbService();
+export const vectorStoreService = new VectorStoreService();

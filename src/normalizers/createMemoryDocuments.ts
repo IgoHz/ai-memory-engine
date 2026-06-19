@@ -1,7 +1,7 @@
 import type { ParsedMemoryFile } from '../types/parsedMemoryFile.js';
 import type { MemoryDocument, MemoryMetadata } from '../types/memory.js';
 import { stat } from 'node:fs/promises';
-import { indexerService } from '../indexer/';
+import { indexerService } from '../services';
 
 export async function createMemoryDocuments(
   files: ParsedMemoryFile[]

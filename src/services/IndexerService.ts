@@ -1,15 +1,14 @@
-import { registryService } from '../registry';
+import { registryService } from './RegistryService.js';
 import { ProjectsRegistry } from '../types/project';
 import { createProjectDocuments } from '../normalizers/createProjectDocuments';
 import { logger } from '../utils/logger';
 import { createHash } from 'crypto';
 import { MemoryDocument } from '../types/memory';
 import { IndexState } from '../types/indexState';
-import { chunkersService } from '../chunkers';
-import { embeddingsService } from '../embeddings';
-import { lancedbService } from '../db';
+import { embeddingsService } from '.';
 import { access, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname } from 'node:path';
+import { chunkersService, vectorStoreService } from '.';
 
 const INDEX_STATE_PATH = './db/indexState.json';
 
@@ -72,7 +71,7 @@ class IndexerService {
         chunks.map((chunk) => chunk.content)
       );
 
-      await lancedbService.updateDocumentChunks(
+      await vectorStoreService.updateDocumentChunks(
         project,
         document.metadata.filePath,
         chunks,
@@ -149,7 +148,7 @@ class IndexerService {
       chunks.map((chunk) => chunk.content)
     );
 
-    await lancedbService.updateDocumentChunks(
+    await vectorStoreService.updateDocumentChunks(
       document.metadata.project,
       document.metadata.filePath,
       chunks,

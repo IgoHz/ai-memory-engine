@@ -2,7 +2,16 @@ import type { ProjectConfig, ProjectsRegistry } from '../types/project';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import YAML from 'yaml';
-import { registrySchema } from './projectSchema.js';
+import { z } from 'zod';
+
+const projectSchema = z.object({
+  root: z.string(),
+  memoryDir: z.string()
+});
+
+const registrySchema = z.object({
+  projects: z.record(z.string(), projectSchema)
+});
 
 let cachedRegistry: ProjectsRegistry | undefined;
 

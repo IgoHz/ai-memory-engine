@@ -1,6 +1,6 @@
 import { MemoryFile } from '../types/file';
 import { ProjectsRegistry } from '../types/project';
-import { registryService } from '../registry';
+import { registryService } from './RegistryService.js';
 import path from 'path';
 import { glob } from 'glob';
 import fs from 'fs/promises';

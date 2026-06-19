@@ -1,5 +1,5 @@
-import { retrieverService } from '../retrievers';
-import { contextFormatterService } from '../formatters';
+import { retrieverService } from './RetrieversService.js';
+import { formattersService } from './FormattersService.js';
 import type { SearchResult, SearchOptions } from './types';
 
 export class MemorySearchService {
@@ -38,7 +38,7 @@ export class MemorySearchService {
     });
 
     return {
-      content: contextFormatterService.format(chunks),
+      content: formattersService.formatContext(chunks),
       chunksFound: chunks.length
     };
   }
