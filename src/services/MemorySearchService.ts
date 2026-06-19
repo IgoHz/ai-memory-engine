@@ -43,3 +43,5 @@ export class MemorySearchService {
     };
   }
 }
+
+export const memorySearchService = new MemorySearchService();
