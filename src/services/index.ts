@@ -1,1 +1,1 @@
-export * from './memorySearch.js';
+export * from './MemorySearchService.js';
