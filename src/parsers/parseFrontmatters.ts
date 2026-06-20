@@ -1,6 +1,5 @@
 import matter from 'gray-matter';
-import type { RawMemoryFile } from '../types/rawMemoryFile.js';
-import type { ParsedMemoryFile } from '../types/parsedMemoryFile.js';
+import type { RawMemoryFile, ParsedMemoryFile } from '../domains/MemoryFile.js';
 
 export function parseFrontmatters(files: RawMemoryFile[]): ParsedMemoryFile[] {
   return files.map(parseFrontmatter);

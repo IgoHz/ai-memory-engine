@@ -1,15 +1,12 @@
-import {
-  FilterOptions,
-  RetrievedChunk,
-  SearchOptions
-} from '../types/retriever.js';
+import { FilterOptions, RetrieverSearchOptions } from './types.js';
 import { memoryChunkRepository } from '../repositories/MemoryChunkRepository.js';
 import { embeddingsProvider } from '../embeddings/EmbeddingsProvider.js';
+import { RetrievedChunk } from '../domains/RetrievedChunk';
 
 class VectorRetriever {
   async vectorSearch(
     query: string,
-    options: SearchOptions = {}
+    options: RetrieverSearchOptions = {}
   ): Promise<RetrievedChunk[]> {
     if (!options.filters?.project) {
       throw new Error('Project filter is required');

@@ -1,7 +1,7 @@
 import { MemoryDocument } from '../domains/MemoryDocument';
 import { MemoryChunk } from '../domains/MemoryChunk';
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
-import type { ChunkingResult, ChunkStats } from '../types/chunk.js';
+import { ChunkingResult, ChunkStats } from './types';
 
 const MIN_CHUNK_LENGTH = 50;
 const MAX_WHITESPACE_RATIO = 0.8;

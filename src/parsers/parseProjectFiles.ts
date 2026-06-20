@@ -1,5 +1,5 @@
 import type { ProjectsRegistry } from '../domains/Project.js';
-import type { ParsedMemoryFile } from '../types/parsedMemoryFile.js';
+import type { ParsedMemoryFile } from '../domains/MemoryFile.js';
 import { parseFrontmatters } from './parseFrontmatters.js';
 import { fileLoader } from '../indexing/FileLoader.js';
 

@@ -1,4 +1,4 @@
-import type { ParsedMemoryFile } from '../types/parsedMemoryFile.js';
+import type { ParsedMemoryFile } from '../domains/MemoryFile.js';
 import type { MemoryDocument } from '../domains/MemoryDocument.js';
 import { stat } from 'node:fs/promises';
 import { incrementalIndexer } from '../indexing/IncrementalIndexer.js';

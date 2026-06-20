@@ -1,8 +1,8 @@
 import { Table } from '@lancedb/lancedb';
 import type { MemoryChunk } from '../domains/MemoryChunk.js';
 import { logger } from '../utils/logger.js';
-import { VectorRecord } from '../types/vectorRecord.js';
 import { projectTableRepository } from './ProjectTableRepository.js';
+import { VectorRecord } from './types.js';
 
 export const VECTOR_DIMENSIONS = 768;
 

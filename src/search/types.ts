@@ -1,4 +1,4 @@
-export interface SearchOptions {
+export interface MemorySearchOptions {
   query: string;
   project: string;
   limit?: number;
@@ -6,7 +6,7 @@ export interface SearchOptions {
   tags?: string[];
 }
 
-export interface SearchResult {
+export interface MemorySearchResult {
   content: string;
   chunksFound: number;
 }
