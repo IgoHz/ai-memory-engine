@@ -3,10 +3,10 @@ import {
   RetrievedChunk,
   SearchOptions
 } from '../types/retriever.js';
-import { vectorStoreService } from '../repositories/VectorStoreService.js';
-import { embeddingsService } from '../embeddings/EmbeddingsService.js';
+import { memoryChunkRepository } from '../repositories/MemoryChunkRepository.js';
+import { embeddingsProvider } from '../embeddings/EmbeddingsProvider.js';
 
-class RetrieverService {
+class VectorRetriever {
   async vectorSearch(
     query: string,
     options: SearchOptions = {}
@@ -15,11 +15,11 @@ class RetrieverService {
       throw new Error('Project filter is required');
     }
 
-    const table = await vectorStoreService.getChunksTable(
+    const table = await memoryChunkRepository.getChunksTable(
       options.filters.project
     );
 
-    const embedding = await embeddingsService.generateEmbedding(query);
+    const embedding = await embeddingsProvider.generateEmbedding(query);
 
     const results = await table.search(embedding).limit(100).toArray();
 
@@ -120,4 +120,4 @@ class RetrieverService {
   }
 }
 
-export const retrieverService = new RetrieverService();
+export const vectorRetriever = new VectorRetriever();

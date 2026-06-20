@@ -1,5 +1,5 @@
-import { MemoryDocument } from '../types/memory';
-import { MemoryChunk } from '../types/memoryChunk';
+import { MemoryDocument } from '../domains/MemoryDocument';
+import { MemoryChunk } from '../domains/MemoryChunk';
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
 import type { ChunkingResult, ChunkStats } from '../types/chunk.js';
 
@@ -7,7 +7,7 @@ const MIN_CHUNK_LENGTH = 50;
 const MAX_WHITESPACE_RATIO = 0.8;
 const MIN_WORD_COUNT = 5;
 
-class ChunkersService {
+class MemoryChunker {
   public async createProjectChunks(
     documents: MemoryDocument[]
   ): Promise<ChunkingResult> {
@@ -160,4 +160,4 @@ class ChunkersService {
   }
 }
 
-export const chunkersService = new ChunkersService();
+export const memoryChunker = new MemoryChunker();

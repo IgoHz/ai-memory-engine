@@ -1,4 +1,4 @@
-import type { MemoryChunk } from './memoryChunk.js';
+import type { MemoryChunk } from '../domains/MemoryChunk.js';
 
 export interface ChunkStats {
   documents: number;

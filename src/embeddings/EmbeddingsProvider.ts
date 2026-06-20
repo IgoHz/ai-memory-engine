@@ -1,6 +1,6 @@
 import { OllamaEmbeddings } from '@langchain/ollama';
 
-class EmbeddingsService {
+class EmbeddingsProvider {
   private readonly embeddings: OllamaEmbeddings;
 
   constructor() {
@@ -21,4 +21,4 @@ class EmbeddingsService {
   }
 }
 
-export const embeddingsService = new EmbeddingsService();
+export const embeddingsProvider = new EmbeddingsProvider();

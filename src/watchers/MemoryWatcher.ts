@@ -1,10 +1,10 @@
 import chokidar, { type FSWatcher } from 'chokidar';
-import type { ProjectConfig } from '../types/project.js';
-import type { ProjectsRegistry } from '../types/project.js';
+import type { ProjectConfig } from '../domains/Project.js';
+import type { ProjectsRegistry } from '../domains/Project.js';
 import { logger } from '../utils/logger.js';
-import { indexerService } from '../indexing/IndexerService.js';
+import { incrementalIndexer } from '../indexing/IncrementalIndexer.js';
 
-class WatchersService {
+class MemoryWatcher {
   private activeProjects: Set<string>;
 
   constructor() {
@@ -55,7 +55,7 @@ class WatchersService {
       this.beginReindex(projectName);
 
       try {
-        await indexerService.indexProject(registry, projectName);
+        await incrementalIndexer.indexProject(registry, projectName);
       } finally {
         this.finishReindex(projectName);
       }
@@ -79,4 +79,4 @@ class WatchersService {
   }
 }
 
-export const watchersService = new WatchersService();
+export const memoryWatcher = new MemoryWatcher();

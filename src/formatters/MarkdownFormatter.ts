@@ -1,6 +1,6 @@
 import { RetrievedChunk } from '../types/retriever';
 
-class FormattersService {
+class MarkdownFormatter {
   formatContext(chunks: RetrievedChunk[]): string {
     return chunks
       .map(
@@ -26,4 +26,4 @@ ${chunk.content}
   }
 }
 
-export const formattersService = new FormattersService();
+export const markdownFormatter = new MarkdownFormatter();

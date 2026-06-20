@@ -1,3 +1,3 @@
-import { mcpServerService } from './mcp/index.js';
+import { mcpServer } from './mcp/index.js';
 
-mcpServerService.start();
+mcpServer.start();

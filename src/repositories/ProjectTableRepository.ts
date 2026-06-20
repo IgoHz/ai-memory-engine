@@ -1,8 +1,8 @@
 import { Connection } from '@lancedb/lancedb';
 import { logger } from '../utils/logger.js';
-import { databaseConnectionService } from './DatabaseConnectionService.js';
+import { DatabaseConnection } from './DatabaseConnection.js';
 
-class ProjectTableService {
+class ProjectTableRepository {
   async getOrCreateProjectTable(db: Connection, project: string) {
     const tableName = this.getProjectTableName(project);
 
@@ -24,7 +24,7 @@ class ProjectTableService {
   }
 
   async getProjectTable(project: string) {
-    const db = await databaseConnectionService.getDatabase();
+    const db = await DatabaseConnection.getDatabase();
 
     return this.getOrCreateProjectTable(db, project);
   }
@@ -34,4 +34,4 @@ class ProjectTableService {
   }
 }
 
-export const projectTableService = new ProjectTableService();
+export const projectTableRepository = new ProjectTableRepository();

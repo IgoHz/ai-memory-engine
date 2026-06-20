@@ -1,5 +1,5 @@
-import type { ProjectsRegistry } from '../types/project.js';
-import type { MemoryDocument } from '../types/memory.js';
+import type { ProjectsRegistry } from '../domains/Project.js';
+import type { MemoryDocument } from '../domains/MemoryDocument.js';
 import { parseProjectFiles } from '../parsers/parseProjectFiles.js';
 import { createMemoryDocuments } from './createMemoryDocuments.js';
 

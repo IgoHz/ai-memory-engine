@@ -11,13 +11,3 @@ export interface MemoryMetadata {
 
   updatedAt?: string;
 }
-
-export interface MemoryDocument {
-  content: string;
-
-  metadata: MemoryMetadata;
-
-  hash: string;
-
-  updatedAt: string;
-}

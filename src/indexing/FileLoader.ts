@@ -1,12 +1,12 @@
 import { MemoryFile } from '../types/file';
-import { ProjectsRegistry } from '../types/project';
-import { registryService } from '../config/RegistryService.js';
+import { ProjectsRegistry } from '../domains/Project';
+import { projectRegistry } from '../config/ProjectRegistry.js';
 import path from 'path';
 import { glob } from 'glob';
 import fs from 'fs/promises';
 import { RawMemoryFile } from '../types/rawMemoryFile';
 
-class LoadersService {
+class FileLoader {
   async loadProjectFiles(
     registry: ProjectsRegistry,
     projectName: string
@@ -20,7 +20,7 @@ class LoadersService {
     registry: ProjectsRegistry,
     projectName: string
   ): Promise<MemoryFile[]> {
-    const project = registryService.getProject(registry, projectName);
+    const project = projectRegistry.getProject(registry, projectName);
 
     const memoryRoot = path.join(project.root, project.memoryDir);
 
@@ -63,4 +63,4 @@ class LoadersService {
   }
 }
 
-export const loadersService = new LoadersService();
+export const fileLoader = new FileLoader();

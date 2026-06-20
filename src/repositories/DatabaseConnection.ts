@@ -5,8 +5,8 @@ import { PATHS } from '../config/paths.js';
 
 let connection: Connection | null = null;
 
-class DatabaseConnectionService {
-  async getDatabase(): Promise<Connection> {
+export class DatabaseConnection {
+  static async getDatabase(): Promise<Connection> {
     if (!connection) {
       logger.info(`Connecting to LanceDB at "${PATHS.DB_DIR}"`);
       connection = await lancedb.connect(PATHS.DB_DIR);
@@ -15,10 +15,8 @@ class DatabaseConnectionService {
     return connection;
   }
 
-  resetDatabase(): void {
+  static resetDatabase(): void {
     logger.info('Resetting LanceDB connection');
     connection = null;
   }
 }
-
-export const databaseConnectionService = new DatabaseConnectionService();

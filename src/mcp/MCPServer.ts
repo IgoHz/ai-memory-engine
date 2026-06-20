@@ -1,8 +1,8 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { mcpToolService } from './MCPToolService';
+import { mcpToolRegistry } from './MCPToolRegistry';
 
-class MCPServerService {
+class MCPServer {
   private readonly server: McpServer;
 
   constructor() {
@@ -18,7 +18,7 @@ class MCPServerService {
       }
     );
 
-    mcpToolService.registerTools(this.server);
+    mcpToolRegistry.registerTools(this.server);
   }
 
   getServer(): McpServer {
@@ -34,4 +34,4 @@ class MCPServerService {
   }
 }
 
-export const mcpServerService = new MCPServerService();
+export const mcpServer = new MCPServer();

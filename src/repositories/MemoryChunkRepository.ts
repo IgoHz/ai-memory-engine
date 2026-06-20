@@ -1,13 +1,12 @@
 import { Table } from '@lancedb/lancedb';
-import type { MemoryChunk } from '../types/memoryChunk.js';
+import type { MemoryChunk } from '../domains/MemoryChunk.js';
 import { logger } from '../utils/logger.js';
 import { VectorRecord } from '../types/vectorRecord.js';
-import { databaseConnectionService } from './DatabaseConnectionService.js';
-import { projectTableService } from './ProjectTableService.js';
+import { projectTableRepository } from './ProjectTableRepository.js';
 
 export const VECTOR_DIMENSIONS = 768;
 
-class VectorStoreService {
+class MemoryChunkRepository {
   async updateDocumentChunks(
     project: string,
     path: string,
@@ -41,7 +40,7 @@ class VectorStoreService {
   }
 
   async getChunksTable(project: string) {
-    return projectTableService.getProjectTable(project);
+    return projectTableRepository.getProjectTable(project);
   }
 
   private async deleteDocumentChunks(
@@ -59,8 +58,6 @@ class VectorStoreService {
     if (!chunkIds.length) {
       return;
     }
-
-    const db = await databaseConnectionService.getDatabase();
 
     const ids = chunkIds.map((id) => `'${id.replaceAll("'", "\\'")}'`);
 
@@ -111,4 +108,4 @@ class VectorStoreService {
   }
 }
 
-export const vectorStoreService = new VectorStoreService();
+export const memoryChunkRepository = new MemoryChunkRepository();

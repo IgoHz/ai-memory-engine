@@ -1,4 +1,4 @@
-import type { MemoryMetadata } from './memory.js';
+import type { MemoryMetadata } from '../domains/MemoryMetadata.js';
 
 export interface VectorRecord extends Record<string, unknown> {
   id: string;

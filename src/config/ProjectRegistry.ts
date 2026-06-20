@@ -1,4 +1,4 @@
-import type { ProjectConfig, ProjectsRegistry } from '../types/project';
+import type { ProjectConfig, ProjectsRegistry } from '../domains/Project';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import YAML from 'yaml';
@@ -15,7 +15,7 @@ const registrySchema = z.object({
 
 let cachedRegistry: ProjectsRegistry | undefined;
 
-class RegistryService {
+class ProjectRegistry {
   getProject(registry: ProjectsRegistry, projectName: string): ProjectConfig {
     const project = registry.projects[projectName];
 
@@ -43,4 +43,4 @@ class RegistryService {
   }
 }
 
-export const registryService = new RegistryService();
+export const projectRegistry = new ProjectRegistry();

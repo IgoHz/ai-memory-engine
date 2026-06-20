@@ -1,8 +1,8 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp';
 import { z } from 'zod';
-import { memorySearchService } from '../search/MemorySearchService';
+import { memorySearch } from '../search/MemorySearchService';
 
-class MCPToolService {
+class MCPToolRegistry {
   registerTools(server: McpServer): void {
     this.registerMemorySearchTool(server);
 
@@ -32,7 +32,7 @@ class MCPToolService {
             {
               type: 'text',
               text: (
-                await memorySearchService.search({
+                await memorySearch.search({
                   query,
                   project,
                   limit,
@@ -64,7 +64,7 @@ class MCPToolService {
             {
               type: 'text',
               text: (
-                await memorySearchService.searchAdr({
+                await memorySearch.searchAdr({
                   query,
                   project
                 })
@@ -93,7 +93,7 @@ class MCPToolService {
             {
               type: 'text',
               text: (
-                await memorySearchService.searchBug({
+                await memorySearch.searchBug({
                   query,
                   project
                 })
@@ -122,7 +122,7 @@ class MCPToolService {
             {
               type: 'text',
               text: (
-                await memorySearchService.searchDecision({
+                await memorySearch.searchDecision({
                   query,
                   project
                 })
@@ -151,7 +151,7 @@ class MCPToolService {
             {
               type: 'text',
               text: (
-                await memorySearchService.searchSnippet({
+                await memorySearch.searchSnippet({
                   query,
                   project
                 })
@@ -164,4 +164,4 @@ class MCPToolService {
   }
 }
 
-export const mcpToolService = new MCPToolService();
+export const mcpToolRegistry = new MCPToolRegistry();

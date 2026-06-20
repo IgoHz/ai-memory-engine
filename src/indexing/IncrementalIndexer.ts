@@ -1,19 +1,19 @@
-import { registryService } from '../config/RegistryService.js';
-import { ProjectsRegistry } from '../types/project.js';
+import { projectRegistry } from '../config/ProjectRegistry.js';
+import { ProjectsRegistry } from '../domains/Project.js';
 import { createProjectDocuments } from '../normalizers/createProjectDocuments.js';
 import { logger } from '../utils/logger.js';
 import { createHash } from 'crypto';
-import { MemoryDocument } from '../types/memory.js';
-import { IndexState } from '../types/indexState.js';
-import { indexStateService } from '../repositories/IndexStateService.js';
+import { MemoryDocument } from '../domains/MemoryDocument.js';
+import { IndexState } from '../domains/IndexState.js';
+import { indexStateRepository } from '../repositories/IndexStateRepository.js';
 import { readFile } from 'fs/promises';
-import { chunkersService } from './ChunkersService.js';
-import { embeddingsService } from '../embeddings/EmbeddingsService.js';
-import { vectorStoreService } from '../repositories/VectorStoreService.js';
+import { memoryChunker } from './MemoryChunker.js';
+import { embeddingsProvider } from '../embeddings/EmbeddingsProvider.js';
+import { memoryChunkRepository } from '../repositories/MemoryChunkRepository.js';
 
-class IndexerService {
+class IncrementalIndexer {
   async indexAllProjects(): Promise<void> {
-    const registry = await registryService.loadProjects();
+    const registry = await projectRegistry.loadProjects();
 
     await Promise.all(
       Object.keys(registry.projects).map((projectName) =>
@@ -30,7 +30,7 @@ class IndexerService {
       project: projectName
     });
 
-    const state = await indexStateService.load();
+    const state = await indexStateRepository.load();
 
     const documents = await createProjectDocuments(registry, projectName);
 
@@ -42,7 +42,7 @@ class IndexerService {
 
     await this.indexChangedDocuments(changedDocuments, state);
 
-    await indexStateService.save(state);
+    await indexStateRepository.save(state);
 
     logger.info('Project indexing finished', {
       project: projectName
@@ -54,13 +54,13 @@ class IndexerService {
     documents: MemoryDocument[]
   ): Promise<void> {
     for (const document of documents) {
-      const chunks = await chunkersService.createDocumentChunks([document]);
+      const chunks = await memoryChunker.createDocumentChunks([document]);
 
-      const embeddings = await embeddingsService.generateEmbeddings(
+      const embeddings = await embeddingsProvider.generateEmbeddings(
         chunks.map((chunk) => chunk.content)
       );
 
-      await vectorStoreService.updateDocumentChunks(
+      await memoryChunkRepository.updateDocumentChunks(
         project,
         document.metadata.filePath,
         chunks,
@@ -131,13 +131,13 @@ class IndexerService {
   }
 
   private async indexDocument(document: MemoryDocument): Promise<void> {
-    const chunks = await chunkersService.createDocumentChunks([document]);
+    const chunks = await memoryChunker.createDocumentChunks([document]);
 
-    const embeddings = await embeddingsService.generateEmbeddings(
+    const embeddings = await embeddingsProvider.generateEmbeddings(
       chunks.map((chunk) => chunk.content)
     );
 
-    await vectorStoreService.updateDocumentChunks(
+    await memoryChunkRepository.updateDocumentChunks(
       document.metadata.project,
       document.metadata.filePath,
       chunks,
@@ -161,4 +161,4 @@ class IndexerService {
   }
 }
 
-export const indexerService = new IndexerService();
+export const incrementalIndexer = new IncrementalIndexer();

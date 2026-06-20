@@ -1,9 +1,9 @@
-import { IndexState } from '../types/indexState';
+import { IndexState } from '../domains/IndexState';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname } from 'node:path';
 import { PATHS } from '../config/paths';
 
-class IndexStateService {
+class IndexStateRepository {
   async load(): Promise<IndexState> {
     try {
       const content = await readFile(PATHS.INDEX_STATE, 'utf8');
@@ -23,4 +23,4 @@ class IndexStateService {
   }
 }
 
-export const indexStateService = new IndexStateService();
+export const indexStateRepository = new IndexStateRepository();

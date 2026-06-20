@@ -1,8 +1,8 @@
-import { formattersService } from '../formatters/FormattersService.js';
-import { retrieverService } from '../retrievers/RetrieversService.js';
-import { SearchOptions, SearchResult } from '../types/search.js';
+import { markdownFormatter } from '../formatters/MarkdownFormatter.js';
+import { vectorRetriever } from '../retrievers/VectorRetriever.js';
+import { SearchOptions, SearchResult } from '../domains/Search.js';
 
-export class MemorySearchService {
+export class MemorySearch {
   async search(options: SearchOptions): Promise<SearchResult> {
     return this.searchByType(undefined, options);
   }
@@ -27,7 +27,7 @@ export class MemorySearchService {
     type: string | undefined,
     options: SearchOptions
   ): Promise<SearchResult> {
-    const chunks = await retrieverService.vectorSearch(options.query, {
+    const chunks = await vectorRetriever.vectorSearch(options.query, {
       limit: options.limit,
       minScore: options.minScore,
       filters: {
@@ -38,10 +38,10 @@ export class MemorySearchService {
     });
 
     return {
-      content: formattersService.formatContext(chunks),
+      content: markdownFormatter.formatContext(chunks),
       chunksFound: chunks.length
     };
   }
 }
 
-export const memorySearchService = new MemorySearchService();
+export const memorySearch = new MemorySearch();
