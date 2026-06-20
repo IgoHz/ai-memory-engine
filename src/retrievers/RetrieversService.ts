@@ -3,8 +3,8 @@ import {
   RetrievedChunk,
   SearchOptions
 } from '../types/retriever.js';
-import { vectorStoreService } from './VectorStoreService.js';
-import { embeddingsService } from './EmbeddingsService.js';
+import { vectorStoreService } from '../repositories/VectorStoreService.js';
+import { embeddingsService } from '../embeddings/EmbeddingsService.js';
 
 class RetrieverService {
   async vectorSearch(

@@ -1,7 +1,7 @@
 import type { ProjectsRegistry } from '../types/project.js';
 import type { ParsedMemoryFile } from '../types/parsedMemoryFile.js';
 import { parseFrontmatters } from './parseFrontmatters.js';
-import { loadersService } from '../services';
+import { loadersService } from '../indexing/LoadersService.js';
 
 export async function parseProjectFiles(
   registry: ProjectsRegistry,

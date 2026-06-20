@@ -1,6 +1,6 @@
-import { retrieverService } from './RetrieversService.js';
-import { formattersService } from './FormattersService.js';
-import type { SearchResult, SearchOptions } from './types';
+import { formattersService } from '../formatters/FormattersService.js';
+import { retrieverService } from '../retrievers/RetrieversService.js';
+import { SearchOptions, SearchResult } from '../types/search.js';
 
 export class MemorySearchService {
   async search(options: SearchOptions): Promise<SearchResult> {

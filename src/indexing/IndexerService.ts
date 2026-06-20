@@ -1,14 +1,15 @@
-import { registryService } from './RegistryService.js';
-import { ProjectsRegistry } from '../types/project';
-import { createProjectDocuments } from '../normalizers/createProjectDocuments';
-import { logger } from '../utils/logger';
+import { registryService } from '../config/RegistryService.js';
+import { ProjectsRegistry } from '../types/project.js';
+import { createProjectDocuments } from '../normalizers/createProjectDocuments.js';
+import { logger } from '../utils/logger.js';
 import { createHash } from 'crypto';
-import { MemoryDocument } from '../types/memory';
-import { IndexState } from '../types/indexState';
-import { embeddingsService } from '.';
-import { chunkersService, vectorStoreService } from '.';
-import { indexStateService } from './IndexStateService';
+import { MemoryDocument } from '../types/memory.js';
+import { IndexState } from '../types/indexState.js';
+import { indexStateService } from '../repositories/IndexStateService.js';
 import { readFile } from 'fs/promises';
+import { chunkersService } from './ChunkersService.js';
+import { embeddingsService } from '../embeddings/EmbeddingsService.js';
+import { vectorStoreService } from '../repositories/VectorStoreService.js';
 
 class IndexerService {
   async indexAllProjects(): Promise<void> {

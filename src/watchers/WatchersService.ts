@@ -1,8 +1,8 @@
 import chokidar, { type FSWatcher } from 'chokidar';
 import type { ProjectConfig } from '../types/project.js';
 import type { ProjectsRegistry } from '../types/project.js';
-import { indexerService } from '../services';
 import { logger } from '../utils/logger.js';
+import { indexerService } from '../indexing/IndexerService.js';
 
 class WatchersService {
   private activeProjects: Set<string>;

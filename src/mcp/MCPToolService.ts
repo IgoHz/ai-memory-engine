@@ -1,6 +1,6 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp';
 import { z } from 'zod';
-import { memorySearchService } from '../services';
+import { memorySearchService } from '../search/MemorySearchService';
 
 class MCPToolService {
   registerTools(server: McpServer): void {
