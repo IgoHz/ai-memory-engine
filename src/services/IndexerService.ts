@@ -6,11 +6,9 @@ import { createHash } from 'crypto';
 import { MemoryDocument } from '../types/memory';
 import { IndexState } from '../types/indexState';
 import { embeddingsService } from '.';
-import { access, mkdir, readFile, writeFile } from 'node:fs/promises';
-import { dirname } from 'node:path';
 import { chunkersService, vectorStoreService } from '.';
-
-const INDEX_STATE_PATH = './db/indexState.json';
+import { indexStateService } from './IndexStateService';
+import { readFile } from 'fs/promises';
 
 class IndexerService {
   async indexAllProjects(): Promise<void> {
@@ -31,7 +29,7 @@ class IndexerService {
       project: projectName
     });
 
-    const state = await this.loadIndexState();
+    const state = await indexStateService.load();
 
     const documents = await createProjectDocuments(registry, projectName);
 
@@ -43,21 +41,11 @@ class IndexerService {
 
     await this.indexChangedDocuments(changedDocuments, state);
 
-    await this.saveIndexState(state);
+    await indexStateService.save(state);
 
     logger.info('Project indexing finished', {
       project: projectName
     });
-  }
-
-  private async loadIndexState(): Promise<IndexState> {
-    try {
-      const content = await readFile(INDEX_STATE_PATH, 'utf8');
-
-      return JSON.parse(content) as IndexState;
-    } catch {
-      return {};
-    }
   }
 
   private async indexDocuments(
@@ -160,32 +148,15 @@ class IndexerService {
     state: IndexState,
     document: MemoryDocument
   ): Promise<void> {
+    const content = await readFile(document.metadata.filePath, 'utf8');
     state[document.metadata.filePath] = {
-      hash: await this.calculateFileHash(document.metadata.filePath),
+      hash: this.calculateFileHash(content),
       updatedAt: new Date().toISOString()
     };
   }
 
   calculateFileHash(content: string): string {
     return createHash('sha256').update(content).digest('hex');
-  }
-
-  private async saveIndexState(state: IndexState): Promise<void> {
-    await mkdir(dirname(INDEX_STATE_PATH), {
-      recursive: true
-    });
-
-    await writeFile(INDEX_STATE_PATH, JSON.stringify(state, null, 2), 'utf8');
-  }
-
-  private async indexStateExists(): Promise<boolean> {
-    try {
-      await access(INDEX_STATE_PATH);
-
-      return true;
-    } catch {
-      return false;
-    }
   }
 }
 

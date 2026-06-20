@@ -1,14 +1,11 @@
-import { Connection, Table } from '@lancedb/lancedb';
+import { Table } from '@lancedb/lancedb';
 import type { MemoryChunk } from '../types/memoryChunk.js';
 import { logger } from '../utils/logger.js';
-import * as lancedb from '@lancedb/lancedb';
-import { DATABASE_PATH } from '../config/database.js';
 import { VectorRecord } from '../types/vectorRecord.js';
+import { databaseConnectionService } from './DatabaseConnectionService.js';
+import { projectTableService } from './ProjectTableService.js';
 
-export const TABLE_NAME = 'memory_chunks';
 export const VECTOR_DIMENSIONS = 768;
-
-let connection: Connection | null = null;
 
 class VectorStoreService {
   async updateDocumentChunks(
@@ -38,19 +35,13 @@ class VectorStoreService {
 
     const chunkIds = chunks.map((chunk) => chunk.id);
 
-    await this.deleteChunks(chunkIds);
+    await this.deleteChunks(table, chunkIds);
 
     await this.addChunks(table, chunks, embeddings);
   }
 
   async getChunksTable(project: string) {
-    return this.getProjectTable(project);
-  }
-
-  private async getProjectTable(project: string) {
-    const db = await this.getDatabase();
-
-    return db.openTable(this.getProjectTableName(project));
+    return projectTableService.getProjectTable(project);
   }
 
   private async deleteDocumentChunks(
@@ -64,13 +55,12 @@ class VectorStoreService {
     });
   }
 
-  private async deleteChunks(chunkIds: string[]): Promise<void> {
+  private async deleteChunks(table: Table, chunkIds: string[]): Promise<void> {
     if (!chunkIds.length) {
       return;
     }
 
-    const db = await this.getDatabase();
-    const table = await db.openTable(TABLE_NAME);
+    const db = await databaseConnectionService.getDatabase();
 
     const ids = chunkIds.map((id) => `'${id.replaceAll("'", "\\'")}'`);
 
@@ -79,30 +69,6 @@ class VectorStoreService {
     logger.info('Deleted vectors', {
       count: chunkIds.length
     });
-  }
-
-  private async createTable(db: Connection, project: string) {
-    const tableName = this.getProjectTableName(project);
-
-    const tableNames = await db.tableNames();
-
-    if (tableNames.includes(tableName)) {
-      logger.info('Opening table', {
-        table: tableName
-      });
-
-      return db.openTable(tableName);
-    }
-
-    logger.info('Creating table', {
-      table: tableName
-    });
-
-    return db.createTable(tableName, []);
-  }
-
-  private getProjectTableName(project: string): string {
-    return `memory_chunks_${project}`;
   }
 
   private async addChunks(
@@ -142,28 +108,6 @@ class VectorStoreService {
 
       metadata: chunk.metadata
     };
-  }
-
-  private async countVectors(): Promise<number> {
-    const db = await this.getDatabase();
-
-    const table = await db.openTable(TABLE_NAME);
-
-    return table.countRows();
-  }
-
-  private async getDatabase(): Promise<Connection> {
-    if (!connection) {
-      logger.info(`Connecting to LanceDB at "${DATABASE_PATH}"`);
-      connection = await lancedb.connect(DATABASE_PATH);
-    }
-
-    return connection;
-  }
-
-  private resetDatabase(): void {
-    logger.info('Resetting LanceDB connection');
-    connection = null;
   }
 }
 
