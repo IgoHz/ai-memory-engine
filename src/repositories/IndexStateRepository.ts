@@ -1,7 +1,7 @@
-import { IndexState } from '../domains/IndexState';
+import { IndexState } from '../domains/IndexState.js';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname } from 'node:path';
-import { PATHS } from '../config/paths';
+import { PATHS } from '../config/paths.js';
 
 class IndexStateRepository {
   async load(): Promise<IndexState> {

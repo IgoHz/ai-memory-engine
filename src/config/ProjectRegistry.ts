@@ -1,4 +1,4 @@
-import type { ProjectConfig, ProjectsRegistry } from '../domains/Project';
+import type { ProjectConfig, ProjectsRegistry } from '../domains/Project.js';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import YAML from 'yaml';

@@ -1,12 +1,13 @@
 import { OllamaEmbeddings } from '@langchain/ollama';
+import { env } from '../config/env.js';
 
 class EmbeddingsProvider {
   private readonly embeddings: OllamaEmbeddings;
 
   constructor() {
     this.embeddings = new OllamaEmbeddings({
-      baseUrl: process.env.OLLAMA_BASE_URL,
-      model: process.env.OLLAMA_EMBEDDING_MODEL!
+      baseUrl: env.OLLAMA_BASE_URL,
+      model: env.OLLAMA_MODEL
     });
   }
 

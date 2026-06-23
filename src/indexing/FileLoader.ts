@@ -1,9 +1,9 @@
-import { ProjectsRegistry } from '../domains/Project';
+import { ProjectsRegistry } from '../domains/Project.js';
 import { projectRegistry } from '../config/ProjectRegistry.js';
 import path from 'path';
 import { glob } from 'glob';
 import fs from 'fs/promises';
-import { MemoryFile, RawMemoryFile } from '../domains/MemoryFile';
+import { MemoryFile, RawMemoryFile } from '../domains/MemoryFile.js';
 
 class FileLoader {
   async loadProjectFiles(

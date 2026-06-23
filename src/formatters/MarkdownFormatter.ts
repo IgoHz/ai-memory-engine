@@ -1,4 +1,4 @@
-import { RetrievedChunk } from '../domains/RetrievedChunk';
+import { RetrievedChunk } from '../domains/RetrievedChunk.js';
 
 class MarkdownFormatter {
   formatContext(chunks: RetrievedChunk[]): string {

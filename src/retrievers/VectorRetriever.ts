@@ -1,7 +1,7 @@
 import { FilterOptions, RetrieverSearchOptions } from './types.js';
 import { memoryChunkRepository } from '../repositories/MemoryChunkRepository.js';
 import { embeddingsProvider } from '../embeddings/EmbeddingsProvider.js';
-import { RetrievedChunk } from '../domains/RetrievedChunk';
+import { RetrievedChunk } from '../domains/RetrievedChunk.js';
 
 class VectorRetriever {
   async vectorSearch(

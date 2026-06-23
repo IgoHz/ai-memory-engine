@@ -1,4 +1,4 @@
-import { MemoryMetadata } from './MemoryMetadata';
+import { MemoryMetadata } from './MemoryMetadata.js';
 
 export interface MemoryChunk {
   id: string;

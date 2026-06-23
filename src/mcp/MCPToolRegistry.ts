@@ -1,6 +1,8 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp';
-import { z } from 'zod';
-import { memorySearch } from '../search/MemorySearchService';
+import { MemorySearchSchema } from './schemas/MemorySearchSchema.js';
+import { BasicSearchSchema } from './schemas/BasicSearchSchema.js';
+import { MemorySearchOptions } from '../search/types.js';
+import { memorySearch } from '../search/MemorySearchService.js';
 
 class MCPToolRegistry {
   registerTools(server: McpServer): void {
@@ -18,32 +20,10 @@ class MCPToolRegistry {
       {
         title: 'Memory Search',
         description: 'Search project memories',
-        inputSchema: {
-          query: z.string(),
-          project: z.string(),
-          limit: z.number().optional(),
-          minScore: z.number().optional(),
-          tags: z.array(z.string()).optional()
-        }
+        inputSchema: MemorySearchSchema
       },
-      async ({ query, project, limit, minScore, tags }) => {
-        return {
-          content: [
-            {
-              type: 'text',
-              text: (
-                await memorySearch.search({
-                  query,
-                  project,
-                  limit,
-                  minScore,
-                  tags
-                })
-              ).content
-            }
-          ]
-        };
-      }
+      async (options: MemorySearchOptions) =>
+        this.searchHandler('memory', options)
     );
   }
 
@@ -53,26 +33,9 @@ class MCPToolRegistry {
       {
         title: 'ADR Search',
         description: 'Search ADR memories',
-        inputSchema: {
-          query: z.string(),
-          project: z.string()
-        }
+        inputSchema: BasicSearchSchema
       },
-      async ({ query, project }) => {
-        return {
-          content: [
-            {
-              type: 'text',
-              text: (
-                await memorySearch.searchAdr({
-                  query,
-                  project
-                })
-              ).content
-            }
-          ]
-        };
-      }
+      async (options: MemorySearchOptions) => this.searchHandler('adr', options)
     );
   }
 
@@ -82,26 +45,9 @@ class MCPToolRegistry {
       {
         title: 'Bug Search',
         description: 'Search bug memories',
-        inputSchema: {
-          query: z.string(),
-          project: z.string()
-        }
+        inputSchema: BasicSearchSchema
       },
-      async ({ query, project }) => {
-        return {
-          content: [
-            {
-              type: 'text',
-              text: (
-                await memorySearch.searchBug({
-                  query,
-                  project
-                })
-              ).content
-            }
-          ]
-        };
-      }
+      async (options: MemorySearchOptions) => this.searchHandler('bug', options)
     );
   }
 
@@ -111,26 +57,10 @@ class MCPToolRegistry {
       {
         title: 'Decision Search',
         description: 'Search decision memories',
-        inputSchema: {
-          query: z.string(),
-          project: z.string()
-        }
+        inputSchema: BasicSearchSchema
       },
-      async ({ query, project }) => {
-        return {
-          content: [
-            {
-              type: 'text',
-              text: (
-                await memorySearch.searchDecision({
-                  query,
-                  project
-                })
-              ).content
-            }
-          ]
-        };
-      }
+      async (options: MemorySearchOptions) =>
+        this.searchHandler('decision', options)
     );
   }
 
@@ -140,27 +70,42 @@ class MCPToolRegistry {
       {
         title: 'Snippet Search',
         description: 'Search code snippets',
-        inputSchema: {
-          query: z.string(),
-          project: z.string()
-        }
+        inputSchema: BasicSearchSchema
       },
-      async ({ query, project }) => {
-        return {
-          content: [
-            {
-              type: 'text',
-              text: (
-                await memorySearch.searchSnippet({
-                  query,
-                  project
-                })
-              ).content
-            }
-          ]
-        };
-      }
+      async (options: MemorySearchOptions) =>
+        this.searchHandler('snippet', options)
     );
+  }
+
+  private async searchHandler(type: string, options: MemorySearchOptions) {
+    const searchFunction = this.getSearchFunction(type);
+    const result = await searchFunction(options);
+
+    return {
+      content: [
+        {
+          type: 'text' as const,
+          text: result.content
+        }
+      ]
+    };
+  }
+
+  private getSearchFunction(type: string) {
+    switch (type) {
+      case 'memory':
+        return memorySearch.search.bind(memorySearch);
+      case 'adr':
+        return memorySearch.searchAdr.bind(memorySearch);
+      case 'bug':
+        return memorySearch.searchBug.bind(memorySearch);
+      case 'decision':
+        return memorySearch.searchDecision.bind(memorySearch);
+      case 'snippet':
+        return memorySearch.searchSnippet.bind(memorySearch);
+      default:
+        throw new Error(`Unknown search type: ${type}`);
+    }
   }
 }
 
