@@ -3,6 +3,8 @@ import { rm } from 'node:fs/promises';
 import { IncrementalIndexer } from '../../src/indexing/IncrementalIndexer.js';
 import { ProjectRegistry } from '../../src/config/ProjectRegistry.js';
 import { TestEmbeddingsProvider } from '../mocks/TestEmbeddingsProvider.js';
+import { MemorySearch } from '../../src/search/MemorySearchService.js';
+import { memoryChunkRepository } from '../../src/repositories/MemoryChunkRepository.js';
 
 export async function buildIntegrationIndex() {
   await rm(
@@ -28,4 +30,8 @@ export async function buildIntegrationIndex() {
   );
 
   await indexer.indexAllProjects();
+}
+
+export function createIntegrationMemorySearch(): MemorySearch {
+  return MemorySearch.create(memoryChunkRepository, new TestEmbeddingsProvider());
 }

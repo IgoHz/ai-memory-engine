@@ -1,8 +1,21 @@
 import { markdownFormatter } from '../formatters/MarkdownFormatter.js';
-import { vectorRetriever } from '../retrievers/VectorRetriever.js';
+import { vectorRetriever, VectorRetriever } from '../retrievers/VectorRetriever.js';
+import type { MemoryChunkReader } from '../retrievers/types.js';
+import type { IEmbeddingsProvider } from '../embeddings/types.js';
 import { MemorySearchOptions, MemorySearchResult } from './types.js';
 
 export class MemorySearch {
+  constructor(private readonly retriever: VectorRetriever = vectorRetriever) {}
+
+  static create(
+    chunkRepository: MemoryChunkReader,
+    embeddingProvider: IEmbeddingsProvider
+  ): MemorySearch {
+    return new MemorySearch(
+      new VectorRetriever(chunkRepository, embeddingProvider)
+    );
+  }
+
   async search(options: MemorySearchOptions): Promise<MemorySearchResult> {
     return this.searchByType(undefined, options);
   }
@@ -31,13 +44,17 @@ export class MemorySearch {
     type: string | undefined,
     options: MemorySearchOptions
   ): Promise<MemorySearchResult> {
-    const chunks = await vectorRetriever.vectorSearch(options.query, {
+    const chunks = await this.retriever.vectorSearch(options.query, {
       limit: options.limit,
       maxDistance: options.maxDistance,
       filters: {
         project: options.project,
         type,
-        tags: options.tags
+        tags: options.tags,
+        path: options.path,
+        archived: options.includeArchived ? undefined : false,
+        maxAgeDays: options.maxAgeDays,
+        relatedTo: options.relatedTo
       }
     });
 

@@ -3,7 +3,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname } from 'node:path';
 import { PATHS } from '../config/paths.js';
 
-class IndexStateRepository {
+export class IndexStateRepository {
   async load(): Promise<IndexState> {
     try {
       const content = await readFile(PATHS.INDEX_STATE, 'utf8');

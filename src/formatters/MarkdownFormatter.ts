@@ -4,7 +4,7 @@ class MarkdownFormatter {
   formatContext(chunks: RetrievedChunk[]): string {
     return chunks
       .map(
-        (chunk) => `[${chunk.metadata.type}] ${chunk.metadata.title}
+        (chunk) => `[${chunk.metadata.project}/${chunk.metadata.type}] ${chunk.metadata.title}
 
 ${chunk.content}`
       )

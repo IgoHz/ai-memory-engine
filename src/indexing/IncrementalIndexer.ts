@@ -4,42 +4,45 @@ import { logger } from '../utils/logger.js';
 import { createHash } from 'crypto';
 import { MemoryDocument } from '../domains/MemoryDocument.js';
 import { IndexState } from '../domains/IndexState.js';
-import { indexStateRepository } from '../repositories/IndexStateRepository.js';
 import { readFile } from 'fs/promises';
 import { memoryChunker } from './MemoryChunker.js';
-import { memoryChunkRepository } from '../repositories/MemoryChunkRepository.js';
 import { ProjectRegistry } from '../config/ProjectRegistry.js';
 import { projectRegistry } from '../config/registry.js';
 import { IEmbeddingsProvider } from '../embeddings/types.js';
 import { embeddingsProvider } from '../embeddings/EmbeddingsProvider.js';
+import path from 'node:path';
+import { IndexStateRepository, indexStateRepository } from '../repositories/IndexStateRepository.js';
+import MemoryChunkRepository, { memoryChunkRepository } from '../repositories/MemoryChunkRepository.js';
 
 export class IncrementalIndexer {
   constructor(
     private readonly projectRegistry: ProjectRegistry,
-    private readonly embeddingsProvider: IEmbeddingsProvider
+    private readonly embeddingsProvider: IEmbeddingsProvider,
+    private readonly stateRepository: IndexStateRepository = indexStateRepository,
+    private readonly chunkRepository: MemoryChunkRepository = memoryChunkRepository
   ) {}
 
   async indexAllProjects(): Promise<void> {
     const registry = await this.projectRegistry.loadProjects();
 
-    const state = await indexStateRepository.load();
+    const state = await this.stateRepository.load();
 
     for (const projectName of Object.keys(registry.projects)) {
       await this.indexProjectInternal(registry, projectName, state);
     }
 
-    await indexStateRepository.save(state);
+    await this.stateRepository.save(state);
   }
 
   async indexProject(
     registry: ProjectsRegistry,
     projectName: string
   ): Promise<void> {
-    const state = await indexStateRepository.load();
+    const state = await this.stateRepository.load();
 
     await this.indexProjectInternal(registry, projectName, state);
 
-    await indexStateRepository.save(state);
+    await this.stateRepository.save(state);
   }
 
   private async indexProjectInternal(
@@ -60,6 +63,8 @@ export class IncrementalIndexer {
 
     const changedDocuments = await this.getChangedDocuments(documents, state);
 
+    await this.removeDeletedDocuments(registry, projectName, documents, state);
+
     logger.info('Changed documents detected', {
       count: changedDocuments.length
     });
@@ -79,7 +84,7 @@ export class IncrementalIndexer {
 
     for (const document of documents) {
       const changed = await this.hasFileChanged(
-        document.metadata.filePath,
+        document.sourcePath,
         state
       );
 
@@ -92,16 +97,16 @@ export class IncrementalIndexer {
   }
 
   private async hasFileChanged(
-    filePath: string,
+    sourcePath: string,
     state: IndexState
   ): Promise<boolean> {
-    const indexedFile = state[filePath];
+    const indexedFile = state[sourcePath];
 
     if (!indexedFile) {
       return true;
     }
 
-    const currentHash = await this.calculateFileHash(filePath);
+    const currentHash = await this.calculateFileHash(sourcePath);
 
     return currentHash !== indexedFile.hash;
   }
@@ -117,6 +122,30 @@ export class IncrementalIndexer {
     }
   }
 
+  private async removeDeletedDocuments(
+    registry: ProjectsRegistry,
+    projectName: string,
+    documents: MemoryDocument[],
+    state: IndexState
+  ): Promise<void> {
+    const project = this.projectRegistry.getProject(registry, projectName);
+    const memoryRoot = path.resolve(process.cwd(), project.memoryDir);
+    const currentPaths = new Set(documents.map((document) => document.sourcePath));
+
+    for (const sourcePath of Object.keys(state)) {
+      if (!sourcePath.startsWith(memoryRoot) || currentPaths.has(sourcePath)) {
+        continue;
+      }
+
+      const relativePath = path.relative(memoryRoot, sourcePath);
+      await this.chunkRepository.deleteDocumentChunksForProject(
+        projectName,
+        relativePath
+      );
+      delete state[sourcePath];
+    }
+  }
+
   private async indexDocument(document: MemoryDocument): Promise<void> {
     const chunks = await memoryChunker.createDocumentChunks([document]);
 
@@ -124,7 +153,7 @@ export class IncrementalIndexer {
       chunks.map((chunk) => chunk.content)
     );
 
-    await memoryChunkRepository.updateDocumentChunks(
+    await this.chunkRepository.updateDocumentChunks(
       document.metadata.project,
       document.metadata.filePath,
       chunks,
@@ -136,8 +165,8 @@ export class IncrementalIndexer {
     state: IndexState,
     document: MemoryDocument
   ): Promise<void> {
-    const content = await readFile(document.metadata.filePath, 'utf8');
-    state[document.metadata.filePath] = {
+    const content = await readFile(document.sourcePath, 'utf8');
+    state[document.sourcePath] = {
       hash: this.calculateContentHash(content),
       updatedAt: new Date().toISOString()
     };

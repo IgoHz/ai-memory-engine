@@ -1,3 +1,3 @@
-import { indexProjectMemories } from './indexing/indexProjectMemories.js';
+import { createApplication } from './app/compositionRoot.js';
 
-await indexProjectMemories();
+await createApplication().indexer.indexAllProjects();

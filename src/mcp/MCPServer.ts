@@ -1,11 +1,11 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { mcpToolRegistry } from './MCPToolRegistry.js';
+import { MCPToolRegistry } from './MCPToolRegistry.js';
 
-class MCPServer {
+export class MCPServer {
   private readonly server: McpServer;
 
-  constructor() {
+  constructor(toolRegistry: MCPToolRegistry) {
     this.server = new McpServer(
       {
         name: 'ai-memory-engine',
@@ -18,7 +18,7 @@ class MCPServer {
       }
     );
 
-    mcpToolRegistry.registerTools(this.server);
+    toolRegistry.registerTools(this.server);
   }
 
   getServer(): McpServer {
@@ -33,5 +33,3 @@ class MCPServer {
     console.error('AI Memory Engine MCP server started');
   }
 }
-
-export const mcpServer = new MCPServer();

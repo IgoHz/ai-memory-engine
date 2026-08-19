@@ -3,20 +3,22 @@ import { logger } from '../utils/logger.js';
 import * as lancedb from '@lancedb/lancedb';
 import { env } from '../config/env.js';
 
-let connection: Connection | null = null;
-
 export class DatabaseConnection {
-  static async getDatabase(): Promise<Connection> {
-    if (!connection) {
-      logger.info(`Connecting to LanceDB at "${env.DB_PATH}"`);
-      connection = await lancedb.connect(env.DB_PATH);
+  private connection: Connection | null = null;
+
+  constructor(private readonly databasePath = env.DB_PATH) {}
+
+  async getDatabase(): Promise<Connection> {
+    if (!this.connection) {
+      logger.info(`Connecting to LanceDB at "${this.databasePath}"`);
+      this.connection = await lancedb.connect(this.databasePath);
     }
 
-    return connection;
+    return this.connection;
   }
 
-  static resetDatabase(): void {
+  resetDatabase(): void {
     logger.info('Resetting LanceDB connection');
-    connection = null;
+    this.connection = null;
   }
 }

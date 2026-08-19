@@ -5,6 +5,8 @@ export interface MemoryDocument {
 
   metadata: MemoryMetadata;
 
+  sourcePath: string;
+
   hash: string;
 
   updatedAt: string;

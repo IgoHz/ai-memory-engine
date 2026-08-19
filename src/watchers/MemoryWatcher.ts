@@ -2,19 +2,30 @@ import chokidar, { type FSWatcher } from 'chokidar';
 import type { ProjectConfig } from '../domains/Project.js';
 import type { ProjectsRegistry } from '../domains/Project.js';
 import { logger } from '../utils/logger.js';
-import { incrementalIndexer } from '../indexing/IncrementalIndexer.js';
+import { IncrementalIndexer, incrementalIndexer } from '../indexing/IncrementalIndexer.js';
 
-class MemoryWatcher {
-  private activeProjects: Set<string>;
+export class MemoryWatcher {
+  private readonly activeProjects = new Set<string>();
+  private readonly watchers = new Map<string, FSWatcher>();
 
-  constructor() {
-    this.activeProjects = new Set<string>();
-  }
+  constructor(private readonly indexer: IncrementalIndexer = incrementalIndexer) {}
 
   startAllWatchers(registry: ProjectsRegistry): void {
     for (const projectName of Object.keys(registry.projects)) {
+      if (this.watchers.has(projectName)) {
+        continue;
+      }
+
       this.startProjectWatcher(registry, projectName);
     }
+  }
+
+  async stopAllWatchers(): Promise<void> {
+    const closing = [...this.watchers.values()].map((watcher) => watcher.close());
+
+    await Promise.all(closing);
+    this.watchers.clear();
+    this.activeProjects.clear();
   }
 
   private startProjectWatcher(
@@ -24,6 +35,8 @@ class MemoryWatcher {
     const project = registry.projects[projectName];
 
     const watcher = this.createProjectWatcher(project);
+
+    this.watchers.set(projectName, watcher);
 
     this.registerWatcherEvents(watcher, registry, projectName);
 
@@ -55,7 +68,7 @@ class MemoryWatcher {
       this.beginReindex(projectName);
 
       try {
-        await incrementalIndexer.indexProject(registry, projectName);
+        await this.indexer.indexProject(registry, projectName);
       } finally {
         this.finishReindex(projectName);
       }

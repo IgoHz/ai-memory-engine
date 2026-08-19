@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { memorySearch } from '../../src/search/MemorySearchService.js';
+import { createIntegrationMemorySearch } from '../helpers/buildIntegrationIndex.js';
+
+const memorySearch = createIntegrationMemorySearch();
 
 describe('Planner tool simulation', () => {
   it('should answer planning questions from memory', async () => {

@@ -2,8 +2,10 @@ import { describe, expect, it } from 'vitest';
 import { DatabaseConnection } from '../../src/repositories/DatabaseConnection.js';
 
 describe('Debug LanceDB', () => {
+  const databaseConnection = new DatabaseConnection();
+
   it('should inspect database state', async () => {
-    const db = await DatabaseConnection.getDatabase();
+    const db = await databaseConnection.getDatabase();
 
     const tables = await db.tableNames();
 
@@ -13,16 +15,14 @@ describe('Debug LanceDB', () => {
   });
 
   it('should inspect table rows', async () => {
-  const db = await DatabaseConnection.getDatabase();
+    const db = await databaseConnection.getDatabase();
 
-  const table = await db.openTable(
-    'memory_chunks_ai-memory-engine'
-  );
+    const table = await db.openTable('memory_chunks_ai-memory-engine');
 
-  const rows = await table.countRows();
+    const rows = await table.countRows();
 
-  console.log('ROWS', rows);
+    console.log('ROWS', rows);
 
-  expect(rows).toBeGreaterThan(0);
-});
+    expect(rows).toBeGreaterThan(0);
+  });
 });

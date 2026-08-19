@@ -2,10 +2,15 @@ import { Connection, Table } from '@lancedb/lancedb';
 import { logger } from '../utils/logger.js';
 import { DatabaseConnection } from './DatabaseConnection.js';
 import { VectorRecord } from './types.js';
+import { env } from '../config/env.js';
 
-class ProjectTableRepository {
+export class ProjectTableRepository {
+  constructor(
+    private readonly databaseConnection = new DatabaseConnection(env.DB_PATH)
+  ) {}
+
   async tableExists(project: string): Promise<boolean> {
-    const db = await DatabaseConnection.getDatabase();
+    const db = await this.databaseConnection.getDatabase();
 
     const tableName = this.getProjectTableName(project);
 
@@ -15,7 +20,7 @@ class ProjectTableRepository {
   }
 
   async getProjectTable(project: string): Promise<Table> {
-    const db = await DatabaseConnection.getDatabase();
+    const db = await this.databaseConnection.getDatabase();
 
     const tableName = this.getProjectTableName(project);
 
@@ -26,8 +31,18 @@ class ProjectTableRepository {
     return db.openTable(tableName);
   }
 
+  async getExistingProjectTables(): Promise<Table[]> {
+    const db = await this.databaseConnection.getDatabase();
+    const tableNames = await db.tableNames();
+    const projectTableNames = tableNames.filter((name) =>
+      name.startsWith('memory_chunks_')
+    );
+
+    return Promise.all(projectTableNames.map((name) => db.openTable(name)));
+  }
+
   async ensureProjectTable(project: string): Promise<Table> {
-    const db = await DatabaseConnection.getDatabase();
+    const db = await this.databaseConnection.getDatabase();
 
     return this.ensureProjectTableForDatabase(db, project);
   }
@@ -64,6 +79,10 @@ class ProjectTableRepository {
         filePath: '',
         title: '',
         tags: ['__bootstrap__'],
+        importance: 0,
+        archived: false,
+        relatedTo: ['__bootstrap__'],
+        updatedAt: '',
         type: ''
       }
     };

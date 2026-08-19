@@ -2,6 +2,8 @@
 type: adr
 tags:
   - adr
+relatedTo:
+  - decision:vector-storage
 ---
 
 # ADR-001

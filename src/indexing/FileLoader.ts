@@ -3,7 +3,6 @@ import path from 'path';
 import { glob } from 'glob';
 import fs from 'fs/promises';
 import { MemoryFile, RawMemoryFile } from '../domains/MemoryFile.js';
-import { projectRegistry } from '../config/registry.js';
 
 class FileLoader {
   async loadProjectFiles(
@@ -19,7 +18,11 @@ class FileLoader {
     registry: ProjectsRegistry,
     projectName: string
   ): Promise<MemoryFile[]> {
-    const project = projectRegistry.getProject(registry, projectName);
+    const project = registry.projects[projectName];
+
+    if (!project) {
+      throw new Error(`Unknown project: ${projectName}`);
+    }
 
     const memoryRoot = path.resolve(process.cwd(), project.memoryDir);
 

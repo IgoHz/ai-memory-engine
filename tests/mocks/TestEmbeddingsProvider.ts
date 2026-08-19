@@ -3,9 +3,7 @@ import { IEmbeddingsProvider } from '../../src/embeddings/types.js';
 export class TestEmbeddingsProvider
   implements IEmbeddingsProvider
 {
-  async generateEmbedding(
-    _text: string
-  ): Promise<number[]> {
+  async generateEmbedding(): Promise<number[]> {
     return new Array(768).fill(0.1);
   }
 

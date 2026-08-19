@@ -6,7 +6,11 @@ import { VectorRecord } from './types.js';
 
 export const VECTOR_DIMENSIONS = 768;
 
-class MemoryChunkRepository {
+export default class MemoryChunkRepository {
+  constructor(
+    private readonly tableRepository = projectTableRepository
+  ) {}
+
   async updateDocumentChunks(
     project: string,
     path: string,
@@ -32,18 +36,35 @@ class MemoryChunkRepository {
     logger.info('Chunks added');
   }
 
+  async deleteDocumentChunksForProject(
+    project: string,
+    path: string
+  ): Promise<void> {
+    const table = await this.getExistingChunksTable(project);
+
+    if (!table) {
+      return;
+    }
+
+    await this.deleteDocumentChunks(table, path);
+  }
+
   async getChunksTable(project: string) {
-    return projectTableRepository.ensureProjectTable(project);
+    return this.tableRepository.ensureProjectTable(project);
   }
 
   async getExistingChunksTable(project: string): Promise<Table | null> {
-    const exists = await projectTableRepository.tableExists(project);
+    const exists = await this.tableRepository.tableExists(project);
 
     if (!exists) {
       return null;
     }
 
-    return projectTableRepository.getProjectTable(project);
+    return this.tableRepository.getProjectTable(project);
+  }
+
+  async getExistingChunksTables(): Promise<Table[]> {
+    return this.tableRepository.getExistingProjectTables();
   }
 
   private async deleteDocumentChunks(

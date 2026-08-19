@@ -7,6 +7,12 @@ export interface MemoryMetadata {
 
   tags: string[];
 
+  importance: number;
+
+  archived: boolean;
+
+  relatedTo: string[];
+
   filePath: string;
 
   updatedAt?: string;

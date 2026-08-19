@@ -13,8 +13,9 @@
     "dev": "tsx src/cli.ts",
     "build": "tsc",
     "index": "tsx src/indexer.ts",
-    "index:watch": "tsx src/watchers/MemoryWatcher.ts",
+    "index:watch": "tsx src/watchers/index.ts",
     "type-check": "tsc --noEmit",
+    "lint": "eslint .",
     "start": "node dist/cli.js",
     "format": "prettier --write src/",
     "test": "vitest",
@@ -47,10 +48,13 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/node": "^25.9.2",
+    "eslint": "^10.8.1",
     "prettier": "^3.8.4",
     "tsx": "^4.22.4",
     "typescript": "^6.0.3",
+    "typescript-eslint": "^8.67.0",
     "vitest": "^4.1.9"
   }
 }

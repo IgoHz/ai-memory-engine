@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { memorySearch } from '../../src/search/MemorySearchService.js';
+import { createIntegrationMemorySearch } from '../helpers/buildIntegrationIndex.js';
+
+const memorySearch = createIntegrationMemorySearch();
 
 describe('Planner ADR search', () => {
   it('should search ADR memories', async () => {
