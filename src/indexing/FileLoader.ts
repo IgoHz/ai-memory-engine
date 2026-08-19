@@ -1,9 +1,9 @@
 import { ProjectsRegistry } from '../domains/Project.js';
-import { projectRegistry } from '../config/ProjectRegistry.js';
 import path from 'path';
 import { glob } from 'glob';
 import fs from 'fs/promises';
 import { MemoryFile, RawMemoryFile } from '../domains/MemoryFile.js';
+import { projectRegistry } from '../config/registry.js';
 
 class FileLoader {
   async loadProjectFiles(
@@ -21,7 +21,13 @@ class FileLoader {
   ): Promise<MemoryFile[]> {
     const project = projectRegistry.getProject(registry, projectName);
 
-    const memoryRoot = path.join(project.root, project.memoryDir);
+    const memoryRoot = path.resolve(process.cwd(), project.memoryDir);
+
+    try {
+      await fs.access(memoryRoot);
+    } catch {
+      throw new Error(`Memory directory does not exist: ${memoryRoot}`);
+    }
 
     const absolutePaths = await glob('**/*.md', {
       cwd: memoryRoot,

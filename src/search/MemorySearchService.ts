@@ -33,7 +33,7 @@ export class MemorySearch {
   ): Promise<MemorySearchResult> {
     const chunks = await vectorRetriever.vectorSearch(options.query, {
       limit: options.limit,
-      minScore: options.minScore,
+      maxDistance: options.maxDistance,
       filters: {
         project: options.project,
         type,

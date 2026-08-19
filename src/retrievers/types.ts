@@ -7,6 +7,6 @@ export interface FilterOptions {
 
 export interface RetrieverSearchOptions {
   limit?: number;
-  minScore?: number;
+  maxDistance?: number;
   filters?: FilterOptions;
 }

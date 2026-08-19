@@ -16,30 +16,33 @@ class MemoryChunkRepository {
     if (!chunks.length) {
       return;
     }
+
+    logger.info('Opening table');
+
     const table = await this.getChunksTable(project);
+
+    logger.info('Deleting existing chunks');
 
     await this.deleteDocumentChunks(table, path);
 
-    await this.addChunks(table, chunks, embeddings);
-  }
-
-  private async updateChunks(
-    table: Table,
-    chunks: MemoryChunk[],
-    embeddings: number[][]
-  ): Promise<void> {
-    if (!chunks.length) {
-      return;
-    }
-
-    const chunkIds = chunks.map((chunk) => chunk.id);
-
-    await this.deleteChunks(table, chunkIds);
+    logger.info('Adding chunks');
 
     await this.addChunks(table, chunks, embeddings);
+
+    logger.info('Chunks added');
   }
 
   async getChunksTable(project: string) {
+    return projectTableRepository.ensureProjectTable(project);
+  }
+
+  async getExistingChunksTable(project: string): Promise<Table | null> {
+    const exists = await projectTableRepository.tableExists(project);
+
+    if (!exists) {
+      return null;
+    }
+
     return projectTableRepository.getProjectTable(project);
   }
 
@@ -47,24 +50,10 @@ class MemoryChunkRepository {
     table: Table,
     path: string
   ): Promise<void> {
-    await table.delete(`metadata.path = '${path.replaceAll("'", "\\'")}'`);
+    await table.delete(`metadata.filePath = '${path.replaceAll("'", "\\'")}'`);
 
     logger.info('Deleted document vectors', {
       path
-    });
-  }
-
-  private async deleteChunks(table: Table, chunkIds: string[]): Promise<void> {
-    if (!chunkIds.length) {
-      return;
-    }
-
-    const ids = chunkIds.map((id) => `'${id.replaceAll("'", "\\'")}'`);
-
-    await table.delete(`id IN (${ids.join(', ')})`);
-
-    logger.info('Deleted vectors', {
-      count: chunkIds.length
     });
   }
 

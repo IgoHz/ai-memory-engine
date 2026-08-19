@@ -1,9 +1,41 @@
-import { Connection } from '@lancedb/lancedb';
+import { Connection, Table } from '@lancedb/lancedb';
 import { logger } from '../utils/logger.js';
 import { DatabaseConnection } from './DatabaseConnection.js';
+import { VectorRecord } from './types.js';
 
 class ProjectTableRepository {
-  async getOrCreateProjectTable(db: Connection, project: string) {
+  async tableExists(project: string): Promise<boolean> {
+    const db = await DatabaseConnection.getDatabase();
+
+    const tableName = this.getProjectTableName(project);
+
+    const tableNames = await db.tableNames();
+
+    return tableNames.includes(tableName);
+  }
+
+  async getProjectTable(project: string): Promise<Table> {
+    const db = await DatabaseConnection.getDatabase();
+
+    const tableName = this.getProjectTableName(project);
+
+    logger.info('Opening table', {
+      table: tableName
+    });
+
+    return db.openTable(tableName);
+  }
+
+  async ensureProjectTable(project: string): Promise<Table> {
+    const db = await DatabaseConnection.getDatabase();
+
+    return this.ensureProjectTableForDatabase(db, project);
+  }
+
+  async ensureProjectTableForDatabase(
+    db: Connection,
+    project: string
+  ): Promise<Table> {
     const tableName = this.getProjectTableName(project);
 
     const tableNames = await db.tableNames();
@@ -20,13 +52,27 @@ class ProjectTableRepository {
       table: tableName
     });
 
-    return db.createTable(tableName, []);
-  }
+    const bootstrapRecord: VectorRecord = {
+      id: '__bootstrap__',
 
-  async getProjectTable(project: string) {
-    const db = await DatabaseConnection.getDatabase();
+      vector: new Array(768).fill(0),
 
-    return this.getOrCreateProjectTable(db, project);
+      content: '',
+
+      metadata: {
+        project,
+        filePath: '',
+        title: '',
+        tags: ['__bootstrap__'],
+        type: ''
+      }
+    };
+
+    const table = await db.createTable(tableName, [bootstrapRecord]);
+
+    await table.delete("id = '__bootstrap__'");
+
+    return table;
   }
 
   private getProjectTableName(project: string): string {

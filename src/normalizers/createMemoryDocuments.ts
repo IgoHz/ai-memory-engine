@@ -3,6 +3,7 @@ import type { MemoryDocument } from '../domains/MemoryDocument.js';
 import { stat } from 'node:fs/promises';
 import { incrementalIndexer } from '../indexing/IncrementalIndexer.js';
 import { MemoryMetadata } from '../domains/MemoryMetadata.js';
+import { createHash } from 'node:crypto';
 
 export async function createMemoryDocuments(
   files: ParsedMemoryFile[]
@@ -20,7 +21,7 @@ async function createMemoryDocument(
 
     metadata: normalizeMetadata(file.project, file.relativePath, file.metadata),
 
-    hash: incrementalIndexer.calculateFileHash(file.content),
+    hash: createHash('sha256').update(file.content).digest('hex'),
 
     updatedAt: stats.mtime.toISOString()
   };

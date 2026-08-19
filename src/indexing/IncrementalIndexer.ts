@@ -1,4 +1,3 @@
-import { projectRegistry } from '../config/ProjectRegistry.js';
 import { ProjectsRegistry } from '../domains/Project.js';
 import { createProjectDocuments } from '../normalizers/createProjectDocuments.js';
 import { logger } from '../utils/logger.js';
@@ -8,31 +7,56 @@ import { IndexState } from '../domains/IndexState.js';
 import { indexStateRepository } from '../repositories/IndexStateRepository.js';
 import { readFile } from 'fs/promises';
 import { memoryChunker } from './MemoryChunker.js';
-import { embeddingsProvider } from '../embeddings/EmbeddingsProvider.js';
 import { memoryChunkRepository } from '../repositories/MemoryChunkRepository.js';
+import { ProjectRegistry } from '../config/ProjectRegistry.js';
+import { projectRegistry } from '../config/registry.js';
+import { IEmbeddingsProvider } from '../embeddings/types.js';
+import { embeddingsProvider } from '../embeddings/EmbeddingsProvider.js';
 
-class IncrementalIndexer {
+export class IncrementalIndexer {
+  constructor(
+    private readonly projectRegistry: ProjectRegistry,
+    private readonly embeddingsProvider: IEmbeddingsProvider
+  ) {}
+
   async indexAllProjects(): Promise<void> {
-    const registry = await projectRegistry.loadProjects();
+    const registry = await this.projectRegistry.loadProjects();
 
-    await Promise.all(
-      Object.keys(registry.projects).map((projectName) =>
-        this.indexProject(registry, projectName)
-      )
-    );
+    const state = await indexStateRepository.load();
+
+    for (const projectName of Object.keys(registry.projects)) {
+      await this.indexProjectInternal(registry, projectName, state);
+    }
+
+    await indexStateRepository.save(state);
   }
 
   async indexProject(
     registry: ProjectsRegistry,
     projectName: string
   ): Promise<void> {
+    const state = await indexStateRepository.load();
+
+    await this.indexProjectInternal(registry, projectName, state);
+
+    await indexStateRepository.save(state);
+  }
+
+  private async indexProjectInternal(
+    registry: ProjectsRegistry,
+    projectName: string,
+    state: IndexState
+  ): Promise<void> {
     logger.info('Starting indexing', {
       project: projectName
     });
 
-    const state = await indexStateRepository.load();
-
     const documents = await createProjectDocuments(registry, projectName);
+
+    logger.info('Documents loaded', {
+      project: projectName,
+      count: documents.length
+    });
 
     const changedDocuments = await this.getChangedDocuments(documents, state);
 
@@ -42,31 +66,9 @@ class IncrementalIndexer {
 
     await this.indexChangedDocuments(changedDocuments, state);
 
-    await indexStateRepository.save(state);
-
     logger.info('Project indexing finished', {
       project: projectName
     });
-  }
-
-  private async indexDocuments(
-    project: string,
-    documents: MemoryDocument[]
-  ): Promise<void> {
-    for (const document of documents) {
-      const chunks = await memoryChunker.createDocumentChunks([document]);
-
-      const embeddings = await embeddingsProvider.generateEmbeddings(
-        chunks.map((chunk) => chunk.content)
-      );
-
-      await memoryChunkRepository.updateDocumentChunks(
-        project,
-        document.metadata.filePath,
-        chunks,
-        embeddings
-      );
-    }
   }
 
   private async getChangedDocuments(
@@ -87,21 +89,6 @@ class IncrementalIndexer {
     }
 
     return changedDocuments;
-  }
-
-  private async getUnindexedFilesCount(
-    documents: MemoryDocument[],
-    state: IndexState
-  ): Promise<number> {
-    let count = 0;
-
-    for (const document of documents) {
-      if (await this.hasFileChanged(document.metadata.filePath, state)) {
-        count++;
-      }
-    }
-
-    return count;
   }
 
   private async hasFileChanged(
@@ -133,7 +120,7 @@ class IncrementalIndexer {
   private async indexDocument(document: MemoryDocument): Promise<void> {
     const chunks = await memoryChunker.createDocumentChunks([document]);
 
-    const embeddings = await embeddingsProvider.generateEmbeddings(
+    const embeddings = await this.embeddingsProvider.generateEmbeddings(
       chunks.map((chunk) => chunk.content)
     );
 
@@ -151,14 +138,23 @@ class IncrementalIndexer {
   ): Promise<void> {
     const content = await readFile(document.metadata.filePath, 'utf8');
     state[document.metadata.filePath] = {
-      hash: this.calculateFileHash(content),
+      hash: this.calculateContentHash(content),
       updatedAt: new Date().toISOString()
     };
   }
 
-  calculateFileHash(content: string): string {
+  private async calculateFileHash(filePath: string): Promise<string> {
+    const content = await readFile(filePath, 'utf8');
+
+    return this.calculateContentHash(content);
+  }
+
+  private calculateContentHash(content: string): string {
     return createHash('sha256').update(content).digest('hex');
   }
 }
 
-export const incrementalIndexer = new IncrementalIndexer();
+export const incrementalIndexer = new IncrementalIndexer(
+  projectRegistry,
+  embeddingsProvider
+);

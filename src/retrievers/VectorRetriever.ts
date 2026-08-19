@@ -12,9 +12,13 @@ class VectorRetriever {
       throw new Error('Project filter is required');
     }
 
-    const table = await memoryChunkRepository.getChunksTable(
+    const table = await memoryChunkRepository.getExistingChunksTable(
       options.filters.project
     );
+
+    if (!table) {
+      return [];
+    }
 
     const embedding = await embeddingsProvider.generateEmbedding(query);
 
@@ -33,9 +37,9 @@ class VectorRetriever {
       this.filterChunk(chunk, options.filters!)
     );
 
-    const scoreFiltered = this.filterByScore(
+    const scoreFiltered = this.filterByDistance(
       metadataFiltered,
-      options.minScore
+      options.maxDistance
     );
 
     const merged = this.mergeChunks(scoreFiltered);
@@ -84,36 +88,34 @@ class VectorRetriever {
     return chunk.metadata.type === type;
   }
 
-  private filterByScore(
+  private filterByDistance(
     chunks: RetrievedChunk[],
-    minScore = 0.35
+    maxDistance = 0.35
   ): RetrievedChunk[] {
-    return chunks.filter((chunk) => chunk.score <= minScore);
+    return chunks.filter((chunk) => chunk.score <= maxDistance);
   }
 
   private mergeChunks(chunks: RetrievedChunk[]): RetrievedChunk[] {
-    if (chunks.length === 0) {
-      return [];
-    }
-
-    const merged: RetrievedChunk[] = [];
+    const grouped = new Map<string, RetrievedChunk>();
 
     for (const chunk of chunks) {
-      const previous = merged.at(-1);
+      const key = chunk.metadata.filePath;
 
-      if (previous && previous.metadata.filePath === chunk.metadata.filePath) {
-        previous.content += '\n\n' + chunk.content;
-        previous.score = Math.min(previous.score, chunk.score);
+      const existing = grouped.get(key);
+
+      if (!existing) {
+        grouped.set(key, {
+          ...chunk
+        });
 
         continue;
       }
 
-      merged.push({
-        ...chunk
-      });
+      existing.content += '\n\n' + chunk.content;
+      existing.score = Math.min(existing.score, chunk.score);
     }
 
-    return merged;
+    return [...grouped.values()];
   }
 }
 

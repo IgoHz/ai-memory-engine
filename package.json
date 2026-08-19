@@ -12,9 +12,14 @@
   "scripts": {
     "dev": "tsx src/cli.ts",
     "build": "tsc",
+    "index": "tsx src/indexer.ts",
+    "index:watch": "tsx src/watchers/MemoryWatcher.ts",
     "type-check": "tsc --noEmit",
     "start": "node dist/cli.js",
-    "format": "prettier --write src/"
+    "format": "prettier --write src/",
+    "test": "vitest",
+    "test:integration": "vitest tests/integration",
+    "test:integration:watch": "vitest tests/integration --watch"
   },
   "repository": {
     "type": "git",
@@ -45,6 +50,7 @@
     "@types/node": "^25.9.2",
     "prettier": "^3.8.4",
     "tsx": "^4.22.4",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.9"
   }
 }

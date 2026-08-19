@@ -1,0 +1,9 @@
+projects:
+  ai-memory-engine:
+    memoryDir: tests/fixtures/memories/ai-memory-engine
+
+  client-a:
+    memoryDir: tests/fixtures/memories/client-a
+
+  pet-project:
+    memoryDir: tests/fixtures/memories/pet-project

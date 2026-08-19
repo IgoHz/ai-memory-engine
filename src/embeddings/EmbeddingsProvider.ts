@@ -1,7 +1,8 @@
 import { OllamaEmbeddings } from '@langchain/ollama';
 import { env } from '../config/env.js';
+import { IEmbeddingsProvider } from './types.js';
 
-class EmbeddingsProvider {
+export class EmbeddingsProvider implements IEmbeddingsProvider {
   private readonly embeddings: OllamaEmbeddings;
 
   constructor() {
@@ -18,7 +19,13 @@ class EmbeddingsProvider {
   }
 
   async generateEmbeddings(texts: string[]): Promise<number[][]> {
-    return this.embeddings.embedDocuments(texts);
+    console.time('embedDocuments');
+
+    const result = await this.embeddings.embedDocuments(texts);
+
+    console.timeEnd('embedDocuments');
+
+    return result;
   }
 }
 

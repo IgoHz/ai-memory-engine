@@ -2,7 +2,7 @@ export interface MemorySearchOptions {
   query: string;
   project: string;
   limit?: number;
-  minScore?: number;
+  maxDistance?: number;
   tags?: string[];
 }
 

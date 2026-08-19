@@ -33,7 +33,7 @@ class MemoryWatcher {
   }
 
   private createProjectWatcher(project: ProjectConfig): FSWatcher {
-    return chokidar.watch(`${project.memoryDir}/**/*.md`, {
+    return chokidar.watch(project.memoryDir, {
       ignoreInitial: true,
       awaitWriteFinish: {
         stabilityThreshold: 500,

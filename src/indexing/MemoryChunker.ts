@@ -26,7 +26,9 @@ class MemoryChunker {
   async createDocumentChunks(
     documents: MemoryDocument[]
   ): Promise<MemoryChunk[]> {
-    const chunkGroups = await Promise.all(documents.map(this.createChunks));
+    const chunkGroups = await Promise.all(
+      documents.map((document) => this.createChunks(document))
+    );
 
     return chunkGroups.flat();
   }
