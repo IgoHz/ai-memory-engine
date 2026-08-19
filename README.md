@@ -174,21 +174,40 @@ Indexing is available from the repository scripts during development (`npm run i
 
 ### Configure an MCP client
 
-For an opencode-style configuration:
+The project is currently distributed as a local checkout rather than an npm
+package. Build it before configuring your MCP client:
+
+```bash
+npm install
+npm run build
+```
+
+For an OpenCode-style configuration, point the command directly at the built
+CLI. Replace the path with the absolute path to your checkout:
 
 ```json
 {
   "mcp": {
     "memory-engine": {
       "type": "local",
-      "command": ["npx", "-y", "ai-memory-engine"],
+      "command": [
+        "node",
+        "/absolute/path/to/ai-memory-engine/dist/cli.js"
+      ],
       "enabled": true
     }
   }
 }
 ```
 
-Set `OLLAMA_BASE_URL`, `OLLAMA_MODEL`, and `DB_PATH` in the environment inherited by the MCP client. The process working directory is significant because project configuration and the default database path are resolved from it.
+The MCP process must inherit the same environment as the local CLI. Set
+`OLLAMA_BASE_URL`, `OLLAMA_MODEL`, and `DB_PATH` as needed. Its working
+directory must contain `config/projects.yaml`; the default database path and
+project configuration are resolved from the working directory.
+
+Do not use `npx -y ai-memory-engine` unless this project has been published to
+npm. With the current local-only setup, npm cannot resolve that package and
+the MCP client will report that the connection was closed.
 
 ## Development
 
