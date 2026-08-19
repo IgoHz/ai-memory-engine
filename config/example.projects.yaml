@@ -1,8 +1,6 @@
 projects:
   pet-project:
-    root: /repos/pet-project
-    memoryDir: memory
+    memoryDir: /absolute/path/to/pet-project/memory
 
   client-a:
-    root: /repos/client-a
-    memoryDir: ai-memory
+    memoryDir: /absolute/path/to/client-a/ai-memory

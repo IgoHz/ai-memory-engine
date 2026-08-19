@@ -13,6 +13,7 @@ import { embeddingsProvider } from '../embeddings/EmbeddingsProvider.js';
 import path from 'node:path';
 import { IndexStateRepository, indexStateRepository } from '../repositories/IndexStateRepository.js';
 import MemoryChunkRepository, { memoryChunkRepository } from '../repositories/MemoryChunkRepository.js';
+import { resolveProjectMemoryDir } from '../config/resolveProjectMemoryDir.js';
 
 export class IncrementalIndexer {
   constructor(
@@ -129,7 +130,7 @@ export class IncrementalIndexer {
     state: IndexState
   ): Promise<void> {
     const project = this.projectRegistry.getProject(registry, projectName);
-    const memoryRoot = path.resolve(process.cwd(), project.memoryDir);
+    const memoryRoot = resolveProjectMemoryDir(project);
     const currentPaths = new Set(documents.map((document) => document.sourcePath));
 
     for (const sourcePath of Object.keys(state)) {

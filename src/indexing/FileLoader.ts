@@ -3,6 +3,7 @@ import path from 'path';
 import { glob } from 'glob';
 import fs from 'fs/promises';
 import { MemoryFile, RawMemoryFile } from '../domains/MemoryFile.js';
+import { resolveProjectMemoryDir } from '../config/resolveProjectMemoryDir.js';
 
 class FileLoader {
   async loadProjectFiles(
@@ -24,7 +25,7 @@ class FileLoader {
       throw new Error(`Unknown project: ${projectName}`);
     }
 
-    const memoryRoot = path.resolve(process.cwd(), project.memoryDir);
+    const memoryRoot = resolveProjectMemoryDir(project);
 
     try {
       await fs.access(memoryRoot);

@@ -4,6 +4,7 @@ import matter from 'gray-matter';
 import { readFile, stat, writeFile } from 'node:fs/promises';
 import type { ProjectConfig, ProjectsRegistry } from '../domains/Project.js';
 import type { ProjectLookup } from './MemoryWriter.js';
+import { resolveProjectMemoryDir } from '../config/resolveProjectMemoryDir.js';
 
 export interface ArchiveResult {
   archivedFiles: string[];
@@ -62,6 +63,6 @@ export class MemoryArchiver {
   }
 
   private getMemoryRoot(project: ProjectConfig): string {
-    return path.resolve(this.workingDirectory, project.memoryDir);
+    return resolveProjectMemoryDir(project, this.workingDirectory);
   }
 }

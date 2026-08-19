@@ -5,6 +5,7 @@ import { readFile } from 'node:fs/promises';
 import type { ProjectsRegistry } from '../domains/Project.js';
 import type { ProjectLookup } from './MemoryWriter.js';
 import { MemoryWriter } from './MemoryWriter.js';
+import { resolveProjectMemoryDir } from '../config/resolveProjectMemoryDir.js';
 
 export class ProjectSummarizer {
   constructor(
@@ -14,7 +15,7 @@ export class ProjectSummarizer {
 
   async writeSummary(registry: ProjectsRegistry, projectName: string): Promise<string> {
     const project = this.projectLookup.getProject(registry, projectName);
-    const memoryRoot = path.resolve(this.workingDirectory, project.memoryDir);
+    const memoryRoot = resolveProjectMemoryDir(project, this.workingDirectory);
     const filePaths = (await glob('**/*.md', { cwd: memoryRoot, absolute: true }))
       .filter((filePath) => path.basename(filePath) !== 'project-summary.md')
       .sort();

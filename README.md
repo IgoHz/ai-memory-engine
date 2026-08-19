@@ -149,10 +149,14 @@ Create `config/projects.yaml` in the working directory:
 ```yaml
 projects:
   my-project:
-    memoryDir: memory
+    memoryDir: /absolute/path/to/my-project/notes
   another-project:
-    memoryDir: notes
+    memoryDir: /absolute/path/to/another-project/notes
 ```
+
+`memoryDir` may be relative to the engine working directory or an absolute path
+to a memory directory anywhere on the filesystem. Absolute paths are useful when
+the engine and the projects it indexes live in separate directories.
 
 The default database location is `./db`. Set these environment variables to override defaults:
 

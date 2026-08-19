@@ -3,6 +3,7 @@ import type { ProjectConfig } from '../domains/Project.js';
 import type { ProjectsRegistry } from '../domains/Project.js';
 import { logger } from '../utils/logger.js';
 import { IncrementalIndexer, incrementalIndexer } from '../indexing/IncrementalIndexer.js';
+import { resolveProjectMemoryDir } from '../config/resolveProjectMemoryDir.js';
 
 export class MemoryWatcher {
   private readonly activeProjects = new Set<string>();
@@ -46,7 +47,7 @@ export class MemoryWatcher {
   }
 
   private createProjectWatcher(project: ProjectConfig): FSWatcher {
-    return chokidar.watch(project.memoryDir, {
+    return chokidar.watch(resolveProjectMemoryDir(project), {
       ignoreInitial: true,
       awaitWriteFinish: {
         stabilityThreshold: 500,

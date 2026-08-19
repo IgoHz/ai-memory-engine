@@ -2,6 +2,7 @@ import path from 'node:path';
 import { mkdir, writeFile } from 'node:fs/promises';
 import YAML from 'yaml';
 import type { ProjectConfig, ProjectsRegistry } from '../domains/Project.js';
+import { resolveProjectMemoryDir } from '../config/resolveProjectMemoryDir.js';
 
 export interface MemoryWriteInput {
   project: string;
@@ -30,7 +31,7 @@ export class MemoryWriter {
     input: MemoryWriteInput
   ): Promise<string> {
     const project = this.projectLookup.getProject(registry, input.project);
-    const memoryRoot = path.resolve(this.workingDirectory, project.memoryDir);
+    const memoryRoot = resolveProjectMemoryDir(project, this.workingDirectory);
     const filePath = path.resolve(memoryRoot, input.fileName);
 
     if (!filePath.startsWith(`${memoryRoot}${path.sep}`) || !filePath.endsWith('.md')) {
