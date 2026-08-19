@@ -125,19 +125,22 @@ Search requests use a `project` field. Use `project: "*"` for global retrieval. 
 ollama pull nomic-embed-text
 ```
 
-### Install from npm
+### Local setup
 
 ```bash
-npm install -g ai-memory-engine
+git clone https://github.com/IgoHz/ai-memory-engine.git
+cd ai-memory-engine
+npm install
+npm run build
 ```
 
-Or run it without a global install:
+The project is currently intended to run from a local checkout. The executable is built to `dist/cli.js` and can be started with:
 
 ```bash
-npx -y ai-memory-engine
+npm start
 ```
 
-The package exposes the `ai-memory-engine` executable. It starts the MCP server and waits for an MCP client on stdin/stdout.
+It starts the MCP server and waits for an MCP client on stdin/stdout. During development, `npm run dev` starts the server directly from TypeScript source.
 
 ### Configure projects
 
@@ -161,10 +164,10 @@ The default database location is `./db`. Set these environment variables to over
 
 ### Run manually
 
-The published CLI starts the MCP server:
+After building the project, start the local CLI:
 
 ```bash
-npx ai-memory-engine
+npm start
 ```
 
 Indexing is available from the repository scripts during development (`npm run index` and `npm run index:watch`). The MCP `memory_store`, `memory_archive_stale`, and `memory_summarize_project` tools also reindex the affected project as part of their workflows.
