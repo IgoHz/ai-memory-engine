@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { createIntegrationMemorySearch } from '../helpers/buildIntegrationIndex.js';
+import { memoryChunkRepository } from '../../src/repositories/MemoryChunkRepository.js';
+import { MemoryRelationshipService } from '../../src/search/MemoryRelationshipService.js';
 
 const memorySearch = createIntegrationMemorySearch();
+const relationships = new MemoryRelationshipService(memoryChunkRepository);
 
 describe('Planner memory search', () => {
   it('should retrieve project memories', async () => {
@@ -99,6 +102,16 @@ describe('Planner memory search', () => {
     });
 
     expect(result.chunksFound).toBeGreaterThan(0);
+  });
+
+  it('should find memories by relationship without a query embedding', async () => {
+    const result = await relationships.findRelated(
+      'ai-memory-engine',
+      'decision:vector-storage'
+    );
+
+    expect(result).toHaveLength(1);
+    expect(result[0].metadata.filePath).toBe('adr-001-vector-storage.md');
   });
 
   it('should support score filtering', async () => {

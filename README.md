@@ -28,7 +28,11 @@ Use the `memory_archive_stale` MCP tool with `project` and `maxAgeDays` to expli
 
 Use `relatedTo` frontmatter and the matching search option to associate memories with decisions, bugs, or other project identifiers.
 
+Use the `memory_related` MCP tool to retrieve memories linked to a relationship identifier without a semantic query.
+
 Highly overlapping retrieved results are conservatively deduplicated before formatting.
+
+Use the `memory_find_duplicates` MCP tool to report cross-file candidates using stored embedding similarity; it does not merge or delete files.
 
 Use the `memory_summarize_project` MCP tool to generate a deterministic `project-summary.md` report.
 

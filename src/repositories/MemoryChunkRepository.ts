@@ -67,6 +67,19 @@ export default class MemoryChunkRepository {
     return this.tableRepository.getExistingProjectTables();
   }
 
+  async getProjectRecords(project: string): Promise<VectorRecord[]> {
+    const table = await this.getExistingChunksTable(project);
+
+    if (!table) {
+      return [];
+    }
+
+    return (await table
+      .query()
+      .select(['id', 'content', 'metadata'])
+      .toArray()) as VectorRecord[];
+  }
+
   private async deleteDocumentChunks(
     table: Table,
     path: string

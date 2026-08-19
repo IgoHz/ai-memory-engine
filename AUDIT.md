@@ -18,9 +18,9 @@ Status is based on the current implementation, not the historical milestone labe
 | 51-54 | Partially complete | MCP registration and tool-level Planner/Builder/Reviewer search coverage exist in the repository, but external OpenCode config verification is not automated. |
 | 55-57 | Mostly complete | `MemoryWriter` persists validated Markdown, `memory_store` exposes it through MCP, and the affected project is explicitly reindexed before the tool returns. |
 | 58 | Mostly complete | `project: "*"` searches all existing project tables, embeds once, preserves project identity, and deduplicates by project plus path. |
-| 59 | Partially complete | `relatedTo` identifiers are normalized, persisted, searchable, and preserved across merged chunks. A reverse relationship index/graph is still missing. |
+| 59 | Mostly complete | `relatedTo` identifiers are normalized, persisted, searchable, preserved across merged chunks, and available through `memory_related` reverse lookup. A dedicated relationship index/graph is still missing. |
 | 60-61 | Missing | Bug history and snippet-library relationship workflows remain unimplemented. |
-| 62 | Partially complete | Retrieval applies conservative lexical near-duplicate removal using a high token-set similarity threshold. Embedding-based semantic deduplication remains future work. |
+| 62 | Mostly complete | Retrieval applies conservative lexical near-duplicate removal, and `memory_find_duplicates` reports cross-file embedding similarity from stored vectors. Automatic destructive merging remains intentionally unimplemented. |
 | 63 | Mostly complete | `ProjectSummarizer` generates `project-summary.md` from current memory metadata and is exposed through MCP with post-write indexing. |
 | 64 | Mostly complete | Optional frontmatter importance is normalized to `[0, 1]` and applies a bounded retrieval ranking adjustment. |
 | 65 | Complete | `archived` frontmatter is persisted and excluded from searches by default; `maxAgeDays` freshness filtering and explicit `memory_archive_stale` archival are supported. Archived projects are reindexed after mutation. |

@@ -10,7 +10,9 @@ export function createMcpServer(): MCPServer {
 		application.projectRegistry,
 		application.indexer,
 		application.archiver,
-		application.summarizer
+		application.summarizer,
+		application.relationships,
+		application.duplicates
 	);
 
 	return new MCPServer(tools);

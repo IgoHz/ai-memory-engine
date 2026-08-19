@@ -42,9 +42,11 @@ Freshness filtering is also read-only: `maxAgeDays` compares indexed file modifi
 
 `MemoryArchiver` provides that explicit mutation through the `memory_archive_stale` MCP tool. It updates only old Markdown files, reports relative paths, and triggers project reindexing after the write.
 
-Relationships currently use lightweight `relatedTo` identifiers in memory metadata. This keeps ADR and bug-history links portable across projects without introducing a graph database; reverse traversal remains future work.
+Relationships currently use lightweight `relatedTo` identifiers in memory metadata. This keeps ADR and bug-history links portable across projects without introducing a graph database. The `memory_related` adapter performs reverse lookup by reading project records.
 
 Retrieval also removes highly similar result text with a conservative token-set similarity check. This reduces repeated context without pretending that lexical overlap is a full semantic deduplication model.
+
+`MemoryDuplicateService` provides the stronger opt-in operation: it compares stored vectors with cosine similarity and reports cross-file candidates through `memory_find_duplicates`. It reports candidates rather than rewriting files.
 
 The next larger feature area is cross-project intelligence beyond retrieval: relationships, semantic deduplication, summaries, and importance/aging policies.
 

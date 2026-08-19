@@ -9,6 +9,8 @@ import MemoryChunkRepository from '../repositories/MemoryChunkRepository.js';
 import { ProjectTableRepository } from '../repositories/ProjectTableRepository.js';
 import { VectorRetriever } from '../retrievers/VectorRetriever.js';
 import { MemorySearch } from '../search/MemorySearchService.js';
+import { MemoryRelationshipService } from '../search/MemoryRelationshipService.js';
+import { MemoryDuplicateService } from '../search/MemoryDuplicateService.js';
 import { projectRegistry } from '../config/registry.js';
 
 export function createApplication() {
@@ -20,6 +22,8 @@ export function createApplication() {
   const indexer = new IncrementalIndexer(projectRegistry, embeddings, state, chunks);
   const retriever = new VectorRetriever(chunks, embeddings);
   const search = new MemorySearch(retriever);
+  const relationships = new MemoryRelationshipService(chunks);
+  const duplicates = new MemoryDuplicateService(chunks);
   const writer = new MemoryWriter(projectRegistry);
   const archiver = new MemoryArchiver(projectRegistry);
   const summarizer = new ProjectSummarizer(projectRegistry);
@@ -34,6 +38,8 @@ export function createApplication() {
     indexer,
     retriever,
     search,
+    relationships,
+    duplicates,
     writer,
     archiver,
     summarizer

@@ -11,6 +11,11 @@ import type { MemoryArchiver } from '../writing/MemoryArchiver.js';
 import { MemoryArchiveSchema } from './schemas/MemoryArchiveSchema.js';
 import { ProjectSummarySchema } from './schemas/ProjectSummarySchema.js';
 import type { ProjectSummarizer } from '../writing/ProjectSummarizer.js';
+import { RelatedMemorySchema } from './schemas/RelatedMemorySchema.js';
+import type { MemoryRelationshipService } from '../search/MemoryRelationshipService.js';
+import type { MemoryDuplicateService } from '../search/MemoryDuplicateService.js';
+import { MemoryDuplicateSchema } from './schemas/MemoryDuplicateSchema.js';
+import { markdownFormatter } from '../formatters/MarkdownFormatter.js';
 
 export class MCPToolRegistry {
   constructor(
@@ -19,7 +24,9 @@ export class MCPToolRegistry {
     private readonly projectRegistry?: ProjectRegistry,
     private readonly indexer?: IncrementalIndexer,
     private readonly memoryArchiver?: MemoryArchiver,
-    private readonly projectSummarizer?: ProjectSummarizer
+    private readonly projectSummarizer?: ProjectSummarizer,
+    private readonly relationships?: MemoryRelationshipService,
+    private readonly duplicates?: MemoryDuplicateService
   ) {}
 
   registerTools(server: McpServer): void {
@@ -32,6 +39,81 @@ export class MCPToolRegistry {
     this.registerMemoryStoreTool(server);
     this.registerMemoryArchiveTool(server);
     this.registerProjectSummaryTool(server);
+    this.registerRelatedMemoryTool(server);
+    this.registerDuplicateMemoryTool(server);
+  }
+
+  private registerDuplicateMemoryTool(server: McpServer): void {
+    if (!this.duplicates) {
+      return;
+    }
+
+    server.registerTool(
+      'memory_find_duplicates',
+      {
+        title: 'Find Duplicate Memories',
+        description: 'Find highly similar memories using stored embeddings',
+        inputSchema: MemoryDuplicateSchema
+      },
+      async ({
+        project,
+        threshold,
+        limit
+      }: {
+        project: string;
+        threshold?: number;
+        limit?: number;
+      }) => {
+        const matches = await this.duplicates!.findDuplicates(
+          project,
+          threshold,
+          limit
+        );
+        const text = matches.length
+          ? matches
+              .map(
+                (match) =>
+                  `[${match.similarity.toFixed(3)}] ${match.left.path} <> ${match.right.path}`
+              )
+              .join('\n')
+          : 'No duplicate memories found.';
+
+        return {
+          content: [{ type: 'text' as const, text }]
+        };
+      }
+    );
+  }
+
+  private registerRelatedMemoryTool(server: McpServer): void {
+    if (!this.relationships) {
+      return;
+    }
+
+    server.registerTool(
+      'memory_related',
+      {
+        title: 'Find Related Memories',
+        description: 'Find memories linked to a relationship identifier',
+        inputSchema: RelatedMemorySchema
+      },
+      async ({ project, relation, limit }: { project: string; relation: string; limit?: number }) => {
+        const chunks = await this.relationships!.findRelated(
+          project,
+          relation,
+          limit
+        );
+
+        return {
+          content: [
+            {
+              type: 'text' as const,
+              text: markdownFormatter.formatContext(chunks)
+            }
+          ]
+        };
+      }
+    );
   }
 
   private registerProjectSummaryTool(server: McpServer): void {
